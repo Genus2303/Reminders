@@ -26,13 +26,15 @@ last_run = {
     'weekly_event_1': None,
     'weekly_event_2': None,
     'biweekly_event_1': None,
-    'biweekly_event_2': None
+    'biweekly_event_2': None,
+    'biweekly_event_3': None,
+    'biweekly_event_4': None
 }
 
 # === SET YOUR START DATES HERE ===
 # For 48-hour events, set the first occurrence date and time (in UTC)
-EVENT_48H_1_START = datetime(2026, 2, 13, 11, 20, 0)  # Example: Feb 14, 2025 at 18:00 UTC
-EVENT_48H_2_START = datetime(2026, 2, 13, 19, 50, 0)  # Example: Feb 15, 2025 at 10:00 UTC
+EVENT_48H_1_START = datetime(2026, 2, 13, 11, 20, 0)
+EVENT_48H_2_START = datetime(2026, 2, 13, 19, 50, 0)
 
 async def send_message(message):
     await bot.wait_until_ready()
@@ -183,12 +185,12 @@ async def scheduler():
     if ENABLE_48H_EVENTS:
         # EVENT 1 - every 48 hours from start date
         if should_trigger_48h_event(EVENT_48H_1_START, now) and should_run_event('48h_event_1', now, cooldown_minutes=2880):  # 48 hours - 1 hour
-            await send_message("@everyone 🔥 Bear 1 starts in 10 minutes!")
+            await send_message("@everyone 🐻 Bear 1 starts in 10 minutes!")
             mark_event_run('48h_event_1', now)
         
         # EVENT 2 - every 48 hours from start date
         if should_trigger_48h_event(EVENT_48H_2_START, now) and should_run_event('48h_event_2', now, cooldown_minutes=2880):  # 48 hours - 1 hour
-            await send_message("@everyone 🔥 Bear 2 starts in 10 minutes!")
+            await send_message("@everyone 🐻 Bear 2 starts in 10 minutes!")
             mark_event_run('48h_event_2', now)
     
     # === WEEKLY EVENTS ===
@@ -205,8 +207,7 @@ async def scheduler():
     
     # === BIWEEKLY EVENTS (every 2 weeks) ===
     if ENABLE_BIWEEKLY_EVENTS:
-        # EVENT 5 - every other Friday at 18:00 (starting from a reference date)
-        # Reference: First Friday of 2025 is Jan 3
+        # EVENT 5 - every other Sunday at 11:50
         reference_date = datetime(2026, 2, 8, 11, 50, 0)
         if now.weekday() == 6 and now.hour == 11 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
@@ -215,8 +216,7 @@ async def scheduler():
                 await send_message("@everyone ⚔️ Foundry legion 2 starts in 10 minutes!")
                 mark_event_run('biweekly_event_1', now)
         
-        # EVENT 6 - every other Monday at 12:00 (starting from a reference date)
-        # Reference: First Monday of 2025 is Jan 6
+        # EVENT 6 - every other Sunday at 19:50
         reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
         if now.weekday() == 6 and now.hour == 19 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
@@ -224,6 +224,24 @@ async def scheduler():
             if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_2', now, cooldown_minutes=20000):  # ~14 days
                 await send_message("@everyone ⚔️ Foundry legion 1 starts in 10 minutes!")
                 mark_event_run('biweekly_event_2', now)
+        
+        # EVENT 7 - every other Monday at 11:50 (reference: Feb 10, 2026)
+        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
+        if now.weekday() == 2 and now.hour == 11 and now.minute == 50:
+            # Check if it's been an even number of weeks since reference
+            days_diff = (now.date() - reference_date_3.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_3', now, cooldown_minutes=20000):  # ~14 days
+                await send_message("@everyone 😈 Crazy Joe starts in 10 minutes!")
+                mark_event_run('biweekly_event_3', now)
+        
+        # EVENT 8 - every other Wednesday at 11:50 (reference: Feb 12, 2026)
+        reference_date_4 = datetime(2026, 2, 12, 19, 50, 0)
+        if now.weekday() == 4 and now.hour == 19 and now.minute == 50:
+            # Check if it's been an even number of weeks since reference
+            days_diff = (now.date() - reference_date_4.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_4', now, cooldown_minutes=20000):  # ~14 days
+                await send_message("@everyone 😈 Crazy Joe starts in 10 minutes!")
+                mark_event_run('biweekly_event_4', now)
 
 @tree.command(name="events", description="Show when all events are scheduled")
 async def show_events(interaction: discord.Interaction):
@@ -278,21 +296,37 @@ async def show_events(interaction: discord.Interaction):
     if ENABLE_BIWEEKLY_EVENTS:
         reference_date = datetime(2026, 2, 8, 11, 50, 0)
         reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
+        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
+        reference_date_4 = datetime(2026, 2, 12, 11, 50, 0)
         
         next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)  
         next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)  
+        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 0, 11, 50, now)
+        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 11, 50, now)
         
         time_to_biweekly1 = next_biweekly1 - now
         time_to_biweekly2 = next_biweekly2 - now
+        time_to_biweekly3 = next_biweekly3 - now
+        time_to_biweekly4 = next_biweekly4 - now
         
         embed.add_field(
-            name="⚔️ Foundry legion 2",
+            name="⚔️ Foundry legion 2 (Every other Sunday 11:50)",
             value=f"Next: <t:{int(next_biweekly1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly1)}**",
             inline=False
         )
         embed.add_field(
-            name="⚔️ Foundry legion 1",
+            name="⚔️ Foundry legion 1 (Every other Sunday 19:50)",
             value=f"Next: <t:{int(next_biweekly2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly2)}**",
+            inline=False
+        )
+        embed.add_field(
+            name="😈 Crazy Joe (Tuesday)",
+            value=f"Next: <t:{int(next_biweekly3.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly3)}**",
+            inline=False
+        )
+        embed.add_field(
+            name="😈 Crazy Joe (Thursday)",
+            value=f"Next: <t:{int(next_biweekly4.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly4)}**",
             inline=False
         )
     
@@ -322,12 +356,18 @@ async def next_event(interaction: discord.Interaction):
         next_events.append(("🎯 Weekly Event 2", next_weekly2))
     
     if ENABLE_BIWEEKLY_EVENTS:
-        reference_date = datetime(2025, 1, 3, 18, 0, 0)
-        reference_date_2 = datetime(2025, 1, 6, 12, 0, 0)
-        next_biweekly1 = get_next_biweekly_event_time(reference_date, 4, 18, 0, now)
-        next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 0, 12, 0, now)
-        next_events.append(("🌟 Biweekly Event 1", next_biweekly1))
-        next_events.append(("👑 Biweekly Event 2", next_biweekly2))
+        reference_date = datetime(2026, 2, 8, 11, 50, 0)
+        reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
+        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
+        reference_date_4 = datetime(2026, 2, 12, 11, 50, 0)
+        next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)
+        next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)
+        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 0, 11, 50, now)
+        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 11, 50, now)
+        next_events.append(("⚔️ Foundry legion 2", next_biweekly1))
+        next_events.append(("⚔️ Foundry legion 1", next_biweekly2))
+        next_events.append(("⚔️ Biweekly Event 3", next_biweekly3))
+        next_events.append(("⚔️ Biweekly Event 4", next_biweekly4))
     
     if not next_events:
         await interaction.response.send_message("No events are currently enabled.")
@@ -372,8 +412,10 @@ async def on_ready():
         print(f"    - Event 2: Every Wednesday at 20:00 UTC")
     print(f"  Biweekly Events: {'ENABLED' if ENABLE_BIWEEKLY_EVENTS else 'DISABLED'}")
     if ENABLE_BIWEEKLY_EVENTS:
-        print(f"    - Event 1: Every other Friday at 18:00 UTC")
-        print(f"    - Event 2: Every other Monday at 12:00 UTC")
+        print(f"    - Foundry legion 2: Every other Sunday at 11:50 UTC")
+        print(f"    - Foundry legion 1: Every other Sunday at 19:50 UTC")
+        print(f"    - Event 3: Every other Monday at 11:50 UTC")
+        print(f"    - Event 4: Every other Wednesday at 11:50 UTC")
     
     # Sync slash commands
     await tree.sync()
@@ -382,6 +424,3 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
-
-
-
