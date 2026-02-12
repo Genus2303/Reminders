@@ -297,7 +297,7 @@ async def show_events(interaction: discord.Interaction):
         reference_date = datetime(2026, 2, 8, 11, 50, 0)
         reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
         reference_date_3 = datetime(2026, 1, 27, 11, 50, 0)
-        reference_date_4 = datetime(2026, 2, 29, 19, 50, 0)
+        reference_date_4 = datetime(2026, 1, 29, 19, 50, 0)
         
         next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)  
         next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)  
@@ -424,6 +424,7 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
 
