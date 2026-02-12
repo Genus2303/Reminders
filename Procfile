@@ -1,2 +1,3 @@
-worker: python Bot.py
+worker: python '/Reminders/Bot.py
+
 
