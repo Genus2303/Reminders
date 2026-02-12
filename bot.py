@@ -226,7 +226,7 @@ async def scheduler():
                 mark_event_run('biweekly_event_2', now)
         
         # EVENT 7 - every other Monday at 11:50 (reference: Feb 10, 2026)
-        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
+        reference_date_3 = datetime(2026, 1, 27, 11, 50, 0)
         if now.weekday() == 1 and now.hour == 11 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date_3.date()).days
@@ -310,12 +310,12 @@ async def show_events(interaction: discord.Interaction):
         time_to_biweekly4 = next_biweekly4 - now
         
         embed.add_field(
-            name="⚔️ Foundry legion 2 (Every other Sunday 11:50)",
+            name="⚔️ Foundry legion 2",
             value=f"Next: <t:{int(next_biweekly1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly1)}**",
             inline=False
         )
         embed.add_field(
-            name="⚔️ Foundry legion 1 (Every other Sunday 19:50)",
+            name="⚔️ Foundry legion 1",
             value=f"Next: <t:{int(next_biweekly2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly2)}**",
             inline=False
         )
@@ -424,6 +424,7 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
 
