@@ -402,7 +402,7 @@ async def show_events(interaction: discord.Interaction):
             inline=False
         )
         embed.add_field(
-            name="✈️ Canyon legion 1 (Every 4 weeks Saturday 20:00)",
+            name="✈️ Canyon legion 2 (Every 4 weeks Saturday 20:00)",
             value=f"Next: <t:{int(next_4weekly2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_4weekly2)}**",
             inline=False
         )
@@ -513,4 +513,5 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
