@@ -232,7 +232,7 @@ async def show_events(interaction: discord.Interaction):
     
     embed = discord.Embed(
         title="📅 SEA Events Schedule 💜",
-        description="All times are in UTC",
+        description="Times are local",
         color=discord.Color.blue()
     )
     
@@ -245,12 +245,12 @@ async def show_events(interaction: discord.Interaction):
         time_to_bear2 = next_bear2 - now
         
         embed.add_field(
-            name="🔥 Bear 1 (Every 48 hours)",
+            name="🐻 Bear 1 (Every 48 hours)",
             value=f"Next: <t:{int(next_bear1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_bear1)}**",
             inline=False
         )
         embed.add_field(
-            name="🔥 Bear 2 (Every 48 hours)",
+            name="🐻 Bear 2 (Every 48 hours)",
             value=f"Next: <t:{int(next_bear2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_bear2)}**",
             inline=False
         )
@@ -382,4 +382,5 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
