@@ -362,8 +362,8 @@ async def next_event(interaction: discord.Interaction):
         reference_date_4 = datetime(2026, 1, 29, 19, 50, 0)
         next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)
         next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)
-        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 0, 11, 50, now)
-        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 19, 50, now)
+        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 1, 11, 50, now)
+        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 3, 19, 50, now)
         next_events.append(("⚔️ Foundry legion 2", next_biweekly1))
         next_events.append(("⚔️ Foundry legion 1", next_biweekly2))
         next_events.append(("😈 Crazy Joe (Tuesday)", next_biweekly3))
@@ -424,6 +424,7 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
 
