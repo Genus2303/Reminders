@@ -76,8 +76,14 @@ def should_trigger_48h_event(start_date, now):
     intervals_passed = hours_since_start / 48
     
     # Check if we're at an interval boundary (within 1 minute tolerance)
-    if abs(intervals_passed - round(intervals_passed)) < (1/60):
-        return True
+    # AND check that we're in the exact minute (hour and minute match)
+    interval_number = round(intervals_passed)
+    expected_time = start_date + timedelta(hours=interval_number * 48)
+    
+    # Must match hour AND minute exactly
+    if now.hour == expected_time.hour and now.minute == expected_time.minute:
+        if abs(intervals_passed - interval_number) < (1/60):
+            return True
     
     return False
 
