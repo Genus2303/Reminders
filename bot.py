@@ -8,7 +8,7 @@ import pytz
 # === ENABLE/DISABLE EVENTS ===
 ENABLE_48H_EVENTS = True
 ENABLE_WEEKLY_EVENTS = False  # Set to False to disable
-ENABLE_BIWEEKLY_EVENTS = False
+ENABLE_BIWEEKLY_EVENTS = True
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -17,6 +17,16 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 UTC = pytz.UTC
+
+# === TRACK LAST RUN TIMES ===
+last_run = {
+    '48h_event_1': None,
+    '48h_event_2': None,
+    'weekly_event_1': None,
+    'weekly_event_2': None,
+    'biweekly_event_1': None,
+    'biweekly_event_2': None
+}
 
 # === SET YOUR START DATES HERE ===
 # For 48-hour events, set the first occurrence date and time (in UTC)
@@ -28,6 +38,25 @@ async def send_message(message):
     channel = client.get_channel(CHANNEL_ID)
     if channel:
         await channel.send(message)
+
+def should_run_event(event_key, now, cooldown_minutes=55):
+    """
+    Check if enough time has passed since the last run of this event.
+    Uses a cooldown to prevent duplicate triggers.
+    Default cooldown is 55 minutes (safe for hourly checks).
+    """
+    global last_run
+    
+    if last_run[event_key] is None:
+        return True
+    
+    time_since_last = now - last_run[event_key]
+    return time_since_last.total_seconds() >= (cooldown_minutes * 60)
+
+def mark_event_run(event_key, now):
+    """Mark an event as having run at the current time"""
+    global last_run
+    last_run[event_key] = now
 
 def should_trigger_48h_event(start_date, now):
     """Check if a 48-hour interval event should trigger"""
@@ -59,22 +88,26 @@ async def scheduler():
     # === 48-HOUR INTERVAL EVENTS ===
     if ENABLE_48H_EVENTS:
         # EVENT 1 - every 48 hours from start date
-        if should_trigger_48h_event(EVENT_48H_1_START, now):
+        if should_trigger_48h_event(EVENT_48H_1_START, now) and should_run_event('48h_event_1', now, cooldown_minutes=2880):  # 48 hours - 1 hour
             await send_message("@everyone 🔥 Bear 1 starts in 10 minutes!")
+            mark_event_run('48h_event_1', now)
         
         # EVENT 2 - every 48 hours from start date
-        if should_trigger_48h_event(EVENT_48H_2_START, now):
+        if should_trigger_48h_event(EVENT_48H_2_START, now) and should_run_event('48h_event_2', now, cooldown_minutes=2880):  # 48 hours - 1 hour
             await send_message("@everyone 🔥 Bear 2 starts in 10 minutes!")
+            mark_event_run('48h_event_2', now)
     
     # === WEEKLY EVENTS ===
     if ENABLE_WEEKLY_EVENTS:
         # EVENT 3 - every Sunday at 14:00
-        if now.weekday() == 6 and now.hour == 14 and now.minute == 0:
+        if now.weekday() == 6 and now.hour == 14 and now.minute == 0 and should_run_event('weekly_event_1', now, cooldown_minutes=10000):  # ~7 days
             await send_message("@everyone ⚔️ Weekly Event 1 starts now!")
+            mark_event_run('weekly_event_1', now)
         
         # EVENT 4 - every Wednesday at 20:00
-        if now.weekday() == 2 and now.hour == 20 and now.minute == 0:
+        if now.weekday() == 2 and now.hour == 20 and now.minute == 0 and should_run_event('weekly_event_2', now, cooldown_minutes=10000):  # ~7 days
             await send_message("@everyone 🎯 Weekly Event 2 starts now!")
+            mark_event_run('weekly_event_2', now)
     
     # === BIWEEKLY EVENTS (every 2 weeks) ===
     if ENABLE_BIWEEKLY_EVENTS:
@@ -84,8 +117,9 @@ async def scheduler():
         if now.weekday() == 4 and now.hour == 18 and now.minute == 0:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_1', now, cooldown_minutes=20000):  # ~14 days
                 await send_message("@everyone 🌟 Biweekly Event 1 starts now!")
+                mark_event_run('biweekly_event_1', now)
         
         # EVENT 6 - every other Monday at 12:00 (starting from a reference date)
         # Reference: First Monday of 2025 is Jan 6
@@ -93,8 +127,9 @@ async def scheduler():
         if now.weekday() == 0 and now.hour == 12 and now.minute == 0:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date_2.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_2', now, cooldown_minutes=20000):  # ~14 days
                 await send_message("@everyone 👑 Biweekly Event 2 starts now!")
+                mark_event_run('biweekly_event_2', now)
 
 @client.event
 async def on_ready():
