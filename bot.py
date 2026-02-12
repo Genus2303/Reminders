@@ -14,7 +14,8 @@ TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
 intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+bot = discord.Client(intents=intents)
+tree = discord.app_commands.CommandTree(bot)
 
 UTC = pytz.UTC
 
@@ -34,8 +35,8 @@ EVENT_48H_1_START = datetime(2025, 2, 13, 11, 20, 0)  # Example: Feb 14, 2025 at
 EVENT_48H_2_START = datetime(2025, 2, 13, 19, 50, 0)  # Example: Feb 15, 2025 at 10:00 UTC
 
 async def send_message(message):
-    await client.wait_until_ready()
-    channel = client.get_channel(CHANNEL_ID)
+    await bot.wait_until_ready()
+    channel = bot.get_channel(CHANNEL_ID)
     if channel:
         await channel.send(message)
 
@@ -57,6 +58,93 @@ def mark_event_run(event_key, now):
     """Mark an event as having run at the current time"""
     global last_run
     last_run[event_key] = now
+
+def format_time_remaining(td):
+    """Format a timedelta into a human-readable string"""
+    total_seconds = int(td.total_seconds())
+    
+    if total_seconds < 0:
+        return "Event is overdue!"
+    
+    days = total_seconds // 86400
+    hours = (total_seconds % 86400) // 3600
+    minutes = (total_seconds % 3600) // 60
+    
+    parts = []
+    if days > 0:
+        parts.append(f"{days}d")
+    if hours > 0:
+        parts.append(f"{hours}h")
+    if minutes > 0:
+        parts.append(f"{minutes}m")
+    
+    return " ".join(parts) if parts else "Less than 1 minute"
+
+def get_next_48h_event_time(start_date, now):
+    """Calculate the next occurrence of a 48-hour event"""
+    if start_date.tzinfo is None:
+        start_date = UTC.localize(start_date)
+    
+    time_diff = now - start_date
+    
+    # If we haven't reached the start date yet
+    if time_diff.total_seconds() < 0:
+        return start_date
+    
+    # Calculate how many intervals have passed
+    hours_since_start = time_diff.total_seconds() / 3600
+    intervals_passed = int(hours_since_start / 48)
+    
+    # Next occurrence is the next interval
+    next_interval = intervals_passed + 1
+    next_time = start_date + timedelta(hours=next_interval * 48)
+    
+    return next_time
+
+def get_next_weekly_event_time(target_weekday, target_hour, target_minute, now):
+    """Calculate the next occurrence of a weekly event"""
+    current_weekday = now.weekday()
+    days_until = (target_weekday - current_weekday) % 7
+    
+    next_date = now.date() + timedelta(days=days_until)
+    next_time = datetime.combine(next_date, datetime.min.time()).replace(
+        hour=target_hour, minute=target_minute, tzinfo=UTC
+    )
+    
+    # If it's today but the time has passed, go to next week
+    if next_time <= now:
+        next_time += timedelta(days=7)
+    
+    return next_time
+
+def get_next_biweekly_event_time(reference_date, target_weekday, target_hour, target_minute, now):
+    """Calculate the next occurrence of a biweekly event"""
+    if reference_date.tzinfo is None:
+        reference_date = UTC.localize(reference_date)
+    
+    # Find the next occurrence of the target weekday
+    current_weekday = now.weekday()
+    days_until = (target_weekday - current_weekday) % 7
+    
+    candidate_date = now.date() + timedelta(days=days_until)
+    candidate_time = datetime.combine(candidate_date, datetime.min.time()).replace(
+        hour=target_hour, minute=target_minute, tzinfo=UTC
+    )
+    
+    # If it's today but the time has passed, move to next occurrence of this weekday
+    if candidate_time <= now:
+        candidate_time += timedelta(days=7)
+        candidate_date = candidate_time.date()
+    
+    # Check if this falls on the correct biweekly cycle
+    days_diff = (candidate_date - reference_date.date()).days
+    weeks_diff = days_diff // 7
+    
+    # If not on the correct cycle, add one more week
+    if weeks_diff % 2 != 0:
+        candidate_time += timedelta(days=7)
+    
+    return candidate_time
 
 def should_trigger_48h_event(start_date, now):
     """Check if a 48-hour interval event should trigger"""
@@ -137,9 +225,141 @@ async def scheduler():
                 await send_message("@everyone 👑 Biweekly Event 2 starts now!")
                 mark_event_run('biweekly_event_2', now)
 
-@client.event
+@tree.command(name="events", description="Show when all events are scheduled")
+async def show_events(interaction: discord.Interaction):
+    """Display all upcoming events with countdowns"""
+    now = datetime.now(UTC)
+    
+    embed = discord.Embed(
+        title="📅 Upcoming Events Schedule",
+        description="All times are in UTC",
+        color=discord.Color.blue()
+    )
+    
+    # 48-hour events
+    if ENABLE_48H_EVENTS:
+        next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
+        next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
+        
+        time_to_bear1 = next_bear1 - now
+        time_to_bear2 = next_bear2 - now
+        
+        embed.add_field(
+            name="🔥 Bear 1 (Every 48 hours)",
+            value=f"Next: <t:{int(next_bear1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_bear1)}**",
+            inline=False
+        )
+        embed.add_field(
+            name="🔥 Bear 2 (Every 48 hours)",
+            value=f"Next: <t:{int(next_bear2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_bear2)}**",
+            inline=False
+        )
+    
+    # Weekly events
+    if ENABLE_WEEKLY_EVENTS:
+        next_weekly1 = get_next_weekly_event_time(6, 14, 0, now)  # Sunday 14:00
+        next_weekly2 = get_next_weekly_event_time(2, 20, 0, now)  # Wednesday 20:00
+        
+        time_to_weekly1 = next_weekly1 - now
+        time_to_weekly2 = next_weekly2 - now
+        
+        embed.add_field(
+            name="⚔️ Weekly Event 1 (Sundays 14:00)",
+            value=f"Next: <t:{int(next_weekly1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_weekly1)}**",
+            inline=False
+        )
+        embed.add_field(
+            name="🎯 Weekly Event 2 (Wednesdays 20:00)",
+            value=f"Next: <t:{int(next_weekly2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_weekly2)}**",
+            inline=False
+        )
+    
+    # Biweekly events
+    if ENABLE_BIWEEKLY_EVENTS:
+        reference_date = datetime(2025, 1, 3, 18, 0, 0)
+        reference_date_2 = datetime(2025, 1, 6, 12, 0, 0)
+        
+        next_biweekly1 = get_next_biweekly_event_time(reference_date, 4, 18, 0, now)  # Friday 18:00
+        next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 0, 12, 0, now)  # Monday 12:00
+        
+        time_to_biweekly1 = next_biweekly1 - now
+        time_to_biweekly2 = next_biweekly2 - now
+        
+        embed.add_field(
+            name="🌟 Biweekly Event 1 (Every other Friday 18:00)",
+            value=f"Next: <t:{int(next_biweekly1.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly1)}**",
+            inline=False
+        )
+        embed.add_field(
+            name="👑 Biweekly Event 2 (Every other Monday 12:00)",
+            value=f"Next: <t:{int(next_biweekly2.timestamp())}:F>\nIn: **{format_time_remaining(time_to_biweekly2)}**",
+            inline=False
+        )
+    
+    if not (ENABLE_48H_EVENTS or ENABLE_WEEKLY_EVENTS or ENABLE_BIWEEKLY_EVENTS):
+        embed.description = "No events are currently enabled."
+    
+    await interaction.response.send_message(embed=embed)
+
+@tree.command(name="next", description="Show the next upcoming event")
+async def next_event(interaction: discord.Interaction):
+    """Display only the next event"""
+    now = datetime.now(UTC)
+    
+    next_events = []
+    
+    # Collect all next events
+    if ENABLE_48H_EVENTS:
+        next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
+        next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
+        next_events.append(("🔥 Bear 1", next_bear1))
+        next_events.append(("🔥 Bear 2", next_bear2))
+    
+    if ENABLE_WEEKLY_EVENTS:
+        next_weekly1 = get_next_weekly_event_time(6, 14, 0, now)
+        next_weekly2 = get_next_weekly_event_time(2, 20, 0, now)
+        next_events.append(("⚔️ Weekly Event 1", next_weekly1))
+        next_events.append(("🎯 Weekly Event 2", next_weekly2))
+    
+    if ENABLE_BIWEEKLY_EVENTS:
+        reference_date = datetime(2025, 1, 3, 18, 0, 0)
+        reference_date_2 = datetime(2025, 1, 6, 12, 0, 0)
+        next_biweekly1 = get_next_biweekly_event_time(reference_date, 4, 18, 0, now)
+        next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 0, 12, 0, now)
+        next_events.append(("🌟 Biweekly Event 1", next_biweekly1))
+        next_events.append(("👑 Biweekly Event 2", next_biweekly2))
+    
+    if not next_events:
+        await interaction.response.send_message("No events are currently enabled.")
+        return
+    
+    # Find the soonest event
+    next_events.sort(key=lambda x: x[1])
+    event_name, event_time = next_events[0]
+    
+    time_remaining = event_time - now
+    
+    embed = discord.Embed(
+        title="⏱️ Next Event",
+        description=f"**{event_name}**",
+        color=discord.Color.green()
+    )
+    embed.add_field(
+        name="Scheduled Time",
+        value=f"<t:{int(event_time.timestamp())}:F>",
+        inline=False
+    )
+    embed.add_field(
+        name="Time Remaining",
+        value=f"**{format_time_remaining(time_remaining)}**",
+        inline=False
+    )
+    
+    await interaction.response.send_message(embed=embed)
+
+@bot.event
 async def on_ready():
-    print(f"Logged in as {client.user}")
+    print(f"Logged in as {bot.user}")
     print(f"Bot is monitoring events in channel ID: {CHANNEL_ID}")
     print(f"\nScheduled Events (all times in UTC):")
     print(f"  48h Events: {'ENABLED' if ENABLE_48H_EVENTS else 'DISABLED'}")
@@ -154,6 +374,11 @@ async def on_ready():
     if ENABLE_BIWEEKLY_EVENTS:
         print(f"    - Event 1: Every other Friday at 18:00 UTC")
         print(f"    - Event 2: Every other Monday at 12:00 UTC")
+    
+    # Sync slash commands
+    await tree.sync()
+    print(f"\nSlash commands synced! Use /events or /next")
+    
     scheduler.start()
 
-client.run(TOKEN)
+bot.run(TOKEN)
