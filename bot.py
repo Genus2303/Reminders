@@ -8,7 +8,7 @@ import pytz
 # === ENABLE/DISABLE EVENTS ===
 ENABLE_48H_EVENTS = True
 ENABLE_WEEKLY_EVENTS = False  # Set to False to disable
-ENABLE_BIWEEKLY_EVENTS = True
+ENABLE_BIWEEKLY_EVENTS = False
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -31,8 +31,8 @@ last_run = {
 
 # === SET YOUR START DATES HERE ===
 # For 48-hour events, set the first occurrence date and time (in UTC)
-EVENT_48H_1_START = datetime(2025, 2, 13, 11, 20, 0)  # Example: Feb 14, 2025 at 18:00 UTC
-EVENT_48H_2_START = datetime(2025, 2, 13, 19, 50, 0)  # Example: Feb 15, 2025 at 10:00 UTC
+EVENT_48H_1_START = datetime(2026, 2, 13, 11, 20, 0)  # Example: Feb 14, 2025 at 18:00 UTC
+EVENT_48H_2_START = datetime(2026, 2, 13, 19, 50, 0)  # Example: Feb 15, 2025 at 10:00 UTC
 
 async def send_message(message):
     await bot.wait_until_ready()
@@ -231,7 +231,7 @@ async def show_events(interaction: discord.Interaction):
     now = datetime.now(UTC)
     
     embed = discord.Embed(
-        title="📅 Upcoming Events Schedule",
+        title="📅 SEA Events Schedule 💜",
         description="All times are in UTC",
         color=discord.Color.blue()
     )
@@ -382,3 +382,4 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
