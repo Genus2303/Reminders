@@ -227,7 +227,7 @@ async def scheduler():
         
         # EVENT 7 - every other Monday at 11:50 (reference: Feb 10, 2026)
         reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
-        if now.weekday() == 2 and now.hour == 11 and now.minute == 50:
+        if now.weekday() == 1 and now.hour == 11 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date_3.date()).days
             if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_3', now, cooldown_minutes=20000):  # ~14 days
@@ -236,7 +236,7 @@ async def scheduler():
         
         # EVENT 8 - every other Wednesday at 11:50 (reference: Feb 12, 2026)
         reference_date_4 = datetime(2026, 2, 12, 19, 50, 0)
-        if now.weekday() == 4 and now.hour == 19 and now.minute == 50:
+        if now.weekday() == 3 and now.hour == 19 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date_4.date()).days
             if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_4', now, cooldown_minutes=20000):  # ~14 days
@@ -424,3 +424,4 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
