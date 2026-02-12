@@ -451,8 +451,8 @@ async def next_event(interaction: discord.Interaction):
         reference_date_6 = datetime(2026, 1, 24, 19, 50, 0)
         next_4weekly1 = get_next_4weekly_event_time(reference_date_5, 5, 11, 50, now)
         next_4weekly2 = get_next_4weekly_event_time(reference_date_6, 5, 19, 50, now)
-        next_events.append(("🌟 4-Weekly Event 1", next_4weekly1))
-        next_events.append(("🌟 4-Weekly Event 2", next_4weekly2))
+        next_events.append(("✈️ Canyon legion 1", next_4weekly1))
+        next_events.append(("✈️ Canyon legion 2", next_4weekly2))
     
     if not next_events:
         await interaction.response.send_message("No events are currently enabled.")
@@ -513,3 +513,4 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
