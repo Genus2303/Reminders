@@ -226,7 +226,7 @@ async def scheduler():
                 mark_event_run('biweekly_event_2', now)
         
         # EVENT 7 - every other Monday at 11:50 (reference: Feb 10, 2026)
-        reference_date_3 = datetime(2026, 1, 27, 11, 50, 0)
+        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
         if now.weekday() == 1 and now.hour == 11 and now.minute == 50:
             # Check if it's been an even number of weeks since reference
             days_diff = (now.date() - reference_date_3.date()).days
@@ -296,13 +296,13 @@ async def show_events(interaction: discord.Interaction):
     if ENABLE_BIWEEKLY_EVENTS:
         reference_date = datetime(2026, 2, 8, 11, 50, 0)
         reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
-        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
-        reference_date_4 = datetime(2026, 2, 12, 11, 50, 0)
+        reference_date_3 = datetime(2026, 1, 27, 11, 50, 0)
+        reference_date_4 = datetime(2026, 2, 29, 19, 50, 0)
         
         next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)  
         next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)  
-        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 0, 11, 50, now)
-        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 11, 50, now)
+        next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 1, 11, 50, now)
+        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 3, 19, 50, now)
         
         time_to_biweekly1 = next_biweekly1 - now
         time_to_biweekly2 = next_biweekly2 - now
@@ -346,8 +346,8 @@ async def next_event(interaction: discord.Interaction):
     if ENABLE_48H_EVENTS:
         next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
         next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
-        next_events.append(("🔥 Bear 1", next_bear1))
-        next_events.append(("🔥 Bear 2", next_bear2))
+        next_events.append(("🐻 Bear 1", next_bear1))
+        next_events.append(("🐻 Bear 2", next_bear2))
     
     if ENABLE_WEEKLY_EVENTS:
         next_weekly1 = get_next_weekly_event_time(6, 14, 0, now)
@@ -358,16 +358,16 @@ async def next_event(interaction: discord.Interaction):
     if ENABLE_BIWEEKLY_EVENTS:
         reference_date = datetime(2026, 2, 8, 11, 50, 0)
         reference_date_2 = datetime(2026, 2, 8, 19, 50, 0)
-        reference_date_3 = datetime(2026, 2, 10, 11, 50, 0)
-        reference_date_4 = datetime(2026, 2, 12, 11, 50, 0)
+        reference_date_3 = datetime(2026, 1, 27, 11, 50, 0)
+        reference_date_4 = datetime(2026, 1, 29, 19, 50, 0)
         next_biweekly1 = get_next_biweekly_event_time(reference_date, 6, 11, 50, now)
         next_biweekly2 = get_next_biweekly_event_time(reference_date_2, 6, 19, 50, now)
         next_biweekly3 = get_next_biweekly_event_time(reference_date_3, 0, 11, 50, now)
-        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 11, 50, now)
+        next_biweekly4 = get_next_biweekly_event_time(reference_date_4, 2, 19, 50, now)
         next_events.append(("⚔️ Foundry legion 2", next_biweekly1))
         next_events.append(("⚔️ Foundry legion 1", next_biweekly2))
-        next_events.append(("⚔️ Biweekly Event 3", next_biweekly3))
-        next_events.append(("⚔️ Biweekly Event 4", next_biweekly4))
+        next_events.append(("😈 Crazy Joe (Tuesday)", next_biweekly3))
+        next_events.append(("😈 Crazy Joe (Thursday)", next_biweekly4))
     
     if not next_events:
         await interaction.response.send_message("No events are currently enabled.")
@@ -424,5 +424,6 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
