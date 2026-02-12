@@ -24,7 +24,7 @@ async def scheduler():
     now = datetime.now(UK)
 
     # EVENT 1 - every 2 days at 18:00
-    if now.hour == 18 and now.minute == 0 and now.day % 2 == 0:
+    if now.hour == 10 and now.minute == 54 and now.day % 2 == 0:
         await send_message("@everyone 🔥 Event 1 starts now!")
 
     # EVENT 2 - weekly Sunday at 14:00
@@ -37,3 +37,4 @@ async def on_ready():
     scheduler.start()
 
 client.run(TOKEN)
+
