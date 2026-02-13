@@ -10,7 +10,7 @@ ENABLE_48H_EVENTS = True
 ENABLE_WEEKLY_EVENTS = False
 ENABLE_BIWEEKLY_EVENTS = True
 ENABLE_4WEEKLY_EVENTS = True
-ENABLE_TEST_ALERT = True  # Set to True to enable test alerts every 5 minutes
+ENABLE_TEST_ALERT = False  # Set to True to enable test alerts every 5 minutes
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -274,7 +274,7 @@ async def scheduler():
     
     # === TEST ALERT ===
     if ENABLE_TEST_ALERT:
-        if now.minute % 2 == 0 and should_run_event('test_alert', now, cooldown_minutes=1):
+        if now.minute % 5 == 0 and should_run_event('test_alert', now, cooldown_minutes=4):
             await send_message("🧪 **TEST ALERT** - Bot is running! Current time: " + now.strftime("%H:%M UTC"))
             mark_event_run('test_alert', now)
     
@@ -489,6 +489,97 @@ async def test_notification(interaction: discord.Interaction):
     # Send test message to the channel
     await send_message(f"🧪 **TEST NOTIFICATION**\nBot is working correctly!\nCurrent time: {now.strftime('%Y-%m-%d %H:%M:%S UTC')}\nTriggered by: {interaction.user.mention}")
 
+@tree.command(name="toggle_test", description="Toggle automatic test alerts on/off")
+async def toggle_test_alerts(interaction: discord.Interaction):
+    """Toggle the automatic test alert feature"""
+    global ENABLE_TEST_ALERT
+    
+    ENABLE_TEST_ALERT = not ENABLE_TEST_ALERT
+    
+    status = "✅ ENABLED" if ENABLE_TEST_ALERT else "❌ DISABLED"
+    message = f"Test alerts are now **{status}**"
+    
+    if ENABLE_TEST_ALERT:
+        message += "\n📢 The bot will send automatic test messages every 5 minutes."
+    else:
+        message += "\n🔇 Automatic test messages are disabled. Use `/test` for manual testing."
+    
+    await interaction.response.send_message(message, ephemeral=True)
+
+@tree.command(name="help_scheduler", description="Show all available commands and event information")
+async def help_scheduler(interaction: discord.Interaction):
+    """Display help menu with all commands and event types"""
+    
+    embed = discord.Embed(
+        title="📚 Event Scheduler Bot - Help Menu",
+        description="Your comprehensive guide to event scheduling commands",
+        color=discord.Color.purple()
+    )
+    
+    # Commands section
+    embed.add_field(
+        name="📋 Available Commands",
+        value=(
+            "**`/events`** - View all scheduled events with countdowns\n"
+            "**`/next`** - Show only the next upcoming event\n"
+            "**`/test`** - Send a one-time test notification\n"
+            "**`/toggle_test`** - Enable/disable automatic test alerts (every 5 min)\n"
+            "**`/help_scheduler`** - Show this help menu"
+        ),
+        inline=False
+    )
+    
+    # Event types section
+    embed.add_field(
+        name="🗓️ Event Types",
+        value=(
+            f"**48-Hour Events:** {len([x for x in [ENABLE_48H_EVENTS] if x])*2} events - Repeats every 2 days\n"
+            f"**Weekly Events:** {len([x for x in [ENABLE_WEEKLY_EVENTS] if x])*2} events - Repeats every week\n"
+            f"**Biweekly Events:** {len([x for x in [ENABLE_BIWEEKLY_EVENTS] if x])*4} events - Repeats every 2 weeks\n"
+            f"**4-Weekly Events:** {len([x for x in [ENABLE_4WEEKLY_EVENTS] if x])*2} events - Repeats every 4 weeks"
+        ),
+        inline=False
+    )
+    
+    # Current status section
+    status_text = []
+    if ENABLE_48H_EVENTS:
+        status_text.append("✅ 48-Hour Events")
+    if ENABLE_WEEKLY_EVENTS:
+        status_text.append("✅ Weekly Events")
+    if ENABLE_BIWEEKLY_EVENTS:
+        status_text.append("✅ Biweekly Events")
+    if ENABLE_4WEEKLY_EVENTS:
+        status_text.append("✅ 4-Weekly Events")
+    if ENABLE_TEST_ALERT:
+        status_text.append("✅ Auto Test Alerts")
+    
+    if not status_text:
+        status_text.append("⚠️ No events currently enabled")
+    
+    embed.add_field(
+        name="⚙️ Current Status",
+        value="\n".join(status_text),
+        inline=False
+    )
+    
+    # Features section
+    embed.add_field(
+        name="✨ Features",
+        value=(
+            "• **Automatic Reminders** - Get notified before events start\n"
+            "• **Timezone Support** - Times shown in your local timezone\n"
+            "• **Countdown Timers** - See exactly when events begin\n"
+            "• **Duplicate Prevention** - Smart cooldowns prevent spam"
+        ),
+        inline=False
+    )
+    
+    # Footer
+    embed.set_footer(text="All event times are in UTC • Bot checks every minute")
+    
+    await interaction.response.send_message(embed=embed)
+
 
 @bot.event
 async def on_ready():
@@ -518,9 +609,9 @@ async def on_ready():
     print(f"  /events - Show all upcoming events")
     print(f"  /next - Show the next event")
     print(f"  /test - Send a test notification")
+    print(f"  /toggle_test - Toggle automatic test alerts on/off")
+    print(f"  /help_scheduler - Show help menu with all commands")
     
     scheduler.start()
 
 bot.run(TOKEN)
-
-
