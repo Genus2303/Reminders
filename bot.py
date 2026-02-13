@@ -522,6 +522,7 @@ async def help_scheduler(interaction: discord.Interaction):
         value=(
             "**`/events`** - View all scheduled events with countdowns\n"
             "**`/next`** - Show only the next upcoming event\n"
+            "**`/today`** - Show all events happening today\n"
             "**`/test`** - Send a one-time test notification\n"
             "**`/toggle_test`** - Enable/disable automatic test alerts (every 5 min)\n"
             "**`/add`** - Add a custom one-time alert\n"
@@ -700,6 +701,134 @@ async def list_custom_alerts(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed)
 
+@tree.command(name="today", description="Show all events scheduled for today")
+async def today_events(interaction: discord.Interaction):
+    """Display all events happening today, marking finished ones"""
+    now = datetime.now(UTC)
+    today = now.date()
+    
+    today_events = []
+    
+    # Check 48-hour events
+    if ENABLE_48H_EVENTS:
+        next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
+        if next_bear1.date() == today:
+            today_events.append((next_bear1, EVENT_48H_1_NAME, next_bear1 < now))
+        
+        # Also check if the previous occurrence was today
+        prev_bear1 = next_bear1 - timedelta(hours=48)
+        if prev_bear1.date() == today:
+            today_events.append((prev_bear1, EVENT_48H_1_NAME, prev_bear1 < now))
+        
+        next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
+        if next_bear2.date() == today:
+            today_events.append((next_bear2, EVENT_48H_2_NAME, next_bear2 < now))
+        
+        prev_bear2 = next_bear2 - timedelta(hours=48)
+        if prev_bear2.date() == today:
+            today_events.append((prev_bear2, EVENT_48H_2_NAME, prev_bear2 < now))
+    
+    # Check weekly events
+    if ENABLE_WEEKLY_EVENTS:
+        if now.weekday() == WEEKLY_1_DAY:
+            event_time = datetime.combine(today, datetime.min.time()).replace(
+                hour=WEEKLY_1_HOUR, minute=WEEKLY_1_MINUTE, tzinfo=UTC
+            )
+            today_events.append((event_time, WEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == WEEKLY_2_DAY:
+            event_time = datetime.combine(today, datetime.min.time()).replace(
+                hour=WEEKLY_2_HOUR, minute=WEEKLY_2_MINUTE, tzinfo=UTC
+            )
+            today_events.append((event_time, WEEKLY_2_NAME, event_time < now))
+    
+    # Check biweekly events
+    if ENABLE_BIWEEKLY_EVENTS:
+        if now.weekday() == BIWEEKLY_1_DAY:
+            days_diff = (today - BIWEEKLY_1_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_1_HOUR, minute=BIWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_2_DAY:
+            days_diff = (today - BIWEEKLY_2_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_2_HOUR, minute=BIWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_2_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_3_DAY:
+            days_diff = (today - BIWEEKLY_3_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_3_HOUR, minute=BIWEEKLY_3_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_3_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_4_DAY:
+            days_diff = (today - BIWEEKLY_4_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_4_HOUR, minute=BIWEEKLY_4_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_4_NAME, event_time < now))
+    
+    # Check 4-weekly events
+    if ENABLE_4WEEKLY_EVENTS:
+        if now.weekday() == FOURWEEKLY_1_DAY:
+            days_diff = (today - FOURWEEKLY_1_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=FOURWEEKLY_1_HOUR, minute=FOURWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, FOURWEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == FOURWEEKLY_2_DAY:
+            days_diff = (today - FOURWEEKLY_2_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=FOURWEEKLY_2_HOUR, minute=FOURWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, FOURWEEKLY_2_NAME, event_time < now))
+    
+    # Check custom alerts
+    for alert_time, name, message in custom_alerts:
+        if alert_time.date() == today:
+            today_events.append((alert_time, f"🔔 {name}", alert_time < now))
+    
+    if not today_events:
+        embed = discord.Embed(
+            title="📅 Today's Events",
+            description=f"No events scheduled for {today.strftime('%A, %B %d, %Y')}",
+            color=discord.Color.orange()
+        )
+        await interaction.response.send_message(embed=embed)
+        return
+    
+    # Sort by time
+    today_events.sort(key=lambda x: x[0])
+    
+    embed = discord.Embed(
+        title="📅 Today's Events",
+        description=f"{today.strftime('%A, %B %d, %Y')} • {len(today_events)} event(s)",
+        color=discord.Color.blue()
+    )
+    
+    for event_time, event_name, is_finished in today_events:
+        status = "✅ Finished" if is_finished else f"⏰ In {format_time_remaining(event_time - now)}"
+        time_str = event_time.strftime("%H:%M UTC")
+        
+        embed.add_field(
+            name=f"{time_str} - {event_name}",
+            value=status,
+            inline=False
+        )
+    
+    await interaction.response.send_message(embed=embed)
+
 
 @bot.event
 async def on_ready():
@@ -728,6 +857,7 @@ async def on_ready():
     print(f"\nAvailable commands:")
     print(f"  /events - Show all upcoming events")
     print(f"  /next - Show the next event")
+    print(f"  /today - Show all events for today")
     print(f"  /test - Send a test notification")
     print(f"  /toggle_test - Toggle automatic test alerts on/off")
     print(f"  /add - Add a custom one-time alert")
