@@ -274,7 +274,7 @@ async def scheduler():
     
     # === TEST ALERT ===
     if ENABLE_TEST_ALERT:
-        if now.minute % 5 == 0 and should_run_event('test_alert', now, cooldown_minutes=4):
+        if now.minute % 2 == 0 and should_run_event('test_alert', now, cooldown_minutes=1):
             await send_message("🧪 **TEST ALERT** - Bot is running! Current time: " + now.strftime("%H:%M UTC"))
             mark_event_run('test_alert', now)
     
@@ -522,3 +522,4 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
