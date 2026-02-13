@@ -112,7 +112,7 @@ last_run = {
 }
 
 # === CUSTOM ONE-TIME ALERTS ===
-custom_alerts = []  # List of tuples: (datetime, message)
+custom_alerts = []  # List of tuples: (datetime, name, message)
 
 async def send_message(message):
     await bot.wait_until_ready()
@@ -278,11 +278,11 @@ async def scheduler():
     # === CUSTOM ONE-TIME ALERTS ===
     global custom_alerts
     triggered_alerts = []
-    for alert_time, message in custom_alerts:
+    for alert_time, name, message in custom_alerts:
         # Check if it's time for this alert (with 1-minute window)
         if is_time_match(now, alert_time.hour, alert_time.minute) and now.date() == alert_time.date():
             await send_message(message)
-            triggered_alerts.append((alert_time, message))
+            triggered_alerts.append((alert_time, name, message))
     
     # Remove triggered alerts
     for alert in triggered_alerts:
@@ -356,89 +356,69 @@ async def scheduler():
 
 @tree.command(name="events", description="Show when all events are scheduled")
 async def show_events(interaction: discord.Interaction):
-    """Display all upcoming events with countdowns"""
+    """Display all upcoming events with countdowns, sorted by time"""
     now = datetime.now(UTC)
     
-    embed = discord.Embed(
-        title="📅 SEA Events Schedule 💜",
-        description="Times are local",
-        color=discord.Color.blue()
-    )
+    # Collect all events with their next occurrence time
+    all_events = []
     
     if ENABLE_48H_EVENTS:
         next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
         next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
-        
-        embed.add_field(
-            name=f"{EVENT_48H_1_NAME} (Every 48 hours)",
-            value=f"Next: <t:{int(next_bear1.timestamp())}:F>\nIn: **{format_time_remaining(next_bear1 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=f"{EVENT_48H_2_NAME} (Every 48 hours)",
-            value=f"Next: <t:{int(next_bear2.timestamp())}:F>\nIn: **{format_time_remaining(next_bear2 - now)}**",
-            inline=False
-        )
+        all_events.append((next_bear1, EVENT_48H_1_NAME + " (Every 48 hours)", next_bear1))
+        all_events.append((next_bear2, EVENT_48H_2_NAME + " (Every 48 hours)", next_bear2))
     
     if ENABLE_WEEKLY_EVENTS:
         next_weekly1 = get_next_weekly_event_time(WEEKLY_1_DAY, WEEKLY_1_HOUR, WEEKLY_1_MINUTE, now)
         next_weekly2 = get_next_weekly_event_time(WEEKLY_2_DAY, WEEKLY_2_HOUR, WEEKLY_2_MINUTE, now)
-        
-        embed.add_field(
-            name=WEEKLY_1_NAME,
-            value=f"Next: <t:{int(next_weekly1.timestamp())}:F>\nIn: **{format_time_remaining(next_weekly1 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=WEEKLY_2_NAME,
-            value=f"Next: <t:{int(next_weekly2.timestamp())}:F>\nIn: **{format_time_remaining(next_weekly2 - now)}**",
-            inline=False
-        )
+        all_events.append((next_weekly1, WEEKLY_1_NAME, next_weekly1))
+        all_events.append((next_weekly2, WEEKLY_2_NAME, next_weekly2))
     
     if ENABLE_BIWEEKLY_EVENTS:
         next_biweekly1 = get_next_biweekly_event_time(BIWEEKLY_1_REFERENCE, BIWEEKLY_1_DAY, BIWEEKLY_1_HOUR, BIWEEKLY_1_MINUTE, now)
         next_biweekly2 = get_next_biweekly_event_time(BIWEEKLY_2_REFERENCE, BIWEEKLY_2_DAY, BIWEEKLY_2_HOUR, BIWEEKLY_2_MINUTE, now)
         next_biweekly3 = get_next_biweekly_event_time(BIWEEKLY_3_REFERENCE, BIWEEKLY_3_DAY, BIWEEKLY_3_HOUR, BIWEEKLY_3_MINUTE, now)
         next_biweekly4 = get_next_biweekly_event_time(BIWEEKLY_4_REFERENCE, BIWEEKLY_4_DAY, BIWEEKLY_4_HOUR, BIWEEKLY_4_MINUTE, now)
-        
-        embed.add_field(
-            name=BIWEEKLY_1_NAME,
-            value=f"Next: <t:{int(next_biweekly1.timestamp())}:F>\nIn: **{format_time_remaining(next_biweekly1 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=BIWEEKLY_2_NAME,
-            value=f"Next: <t:{int(next_biweekly2.timestamp())}:F>\nIn: **{format_time_remaining(next_biweekly2 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=BIWEEKLY_3_NAME,
-            value=f"Next: <t:{int(next_biweekly3.timestamp())}:F>\nIn: **{format_time_remaining(next_biweekly3 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=BIWEEKLY_4_NAME,
-            value=f"Next: <t:{int(next_biweekly4.timestamp())}:F>\nIn: **{format_time_remaining(next_biweekly4 - now)}**",
-            inline=False
-        )
+        all_events.append((next_biweekly1, BIWEEKLY_1_NAME, next_biweekly1))
+        all_events.append((next_biweekly2, BIWEEKLY_2_NAME, next_biweekly2))
+        all_events.append((next_biweekly3, BIWEEKLY_3_NAME, next_biweekly3))
+        all_events.append((next_biweekly4, BIWEEKLY_4_NAME, next_biweekly4))
     
     if ENABLE_4WEEKLY_EVENTS:
         next_4weekly1 = get_next_4weekly_event_time(FOURWEEKLY_1_REFERENCE, FOURWEEKLY_1_DAY, FOURWEEKLY_1_HOUR, FOURWEEKLY_1_MINUTE, now)
         next_4weekly2 = get_next_4weekly_event_time(FOURWEEKLY_2_REFERENCE, FOURWEEKLY_2_DAY, FOURWEEKLY_2_HOUR, FOURWEEKLY_2_MINUTE, now)
-        
-        embed.add_field(
-            name=FOURWEEKLY_1_NAME,
-            value=f"Next: <t:{int(next_4weekly1.timestamp())}:F>\nIn: **{format_time_remaining(next_4weekly1 - now)}**",
-            inline=False
-        )
-        embed.add_field(
-            name=FOURWEEKLY_2_NAME,
-            value=f"Next: <t:{int(next_4weekly2.timestamp())}:F>\nIn: **{format_time_remaining(next_4weekly2 - now)}**",
-            inline=False
-        )
+        all_events.append((next_4weekly1, FOURWEEKLY_1_NAME, next_4weekly1))
+        all_events.append((next_4weekly2, FOURWEEKLY_2_NAME, next_4weekly2))
     
-    if not (ENABLE_48H_EVENTS or ENABLE_WEEKLY_EVENTS or ENABLE_BIWEEKLY_EVENTS or ENABLE_4WEEKLY_EVENTS):
-        embed.description = "No events are currently enabled."
+    # Add custom alerts
+    for alert_time, name, message in custom_alerts:
+        all_events.append((alert_time, f"🔔 {name}", alert_time))
+    
+    if not all_events:
+        embed = discord.Embed(
+            title="📅 SEA Events Schedule 💜",
+            description="No events are currently enabled.",
+            color=discord.Color.blue()
+        )
+        await interaction.response.send_message(embed=embed)
+        return
+    
+    # Sort by time (earliest first)
+    all_events.sort(key=lambda x: x[0])
+    
+    embed = discord.Embed(
+        title="📅 SEA Events Schedule 💜",
+        description="Times are local • Sorted by next occurrence",
+        color=discord.Color.blue()
+    )
+    
+    for event_time, event_name, _ in all_events:
+        time_remaining = event_time - now
+        embed.add_field(
+            name=event_name,
+            value=f"Next: <t:{int(event_time.timestamp())}:F>\nIn: **{format_time_remaining(time_remaining)}**",
+            inline=False
+        )
     
     await interaction.response.send_message(embed=embed)
 
@@ -466,6 +446,10 @@ async def next_event(interaction: discord.Interaction):
     if ENABLE_4WEEKLY_EVENTS:
         next_events.append((FOURWEEKLY_1_NAME, get_next_4weekly_event_time(FOURWEEKLY_1_REFERENCE, FOURWEEKLY_1_DAY, FOURWEEKLY_1_HOUR, FOURWEEKLY_1_MINUTE, now)))
         next_events.append((FOURWEEKLY_2_NAME, get_next_4weekly_event_time(FOURWEEKLY_2_REFERENCE, FOURWEEKLY_2_DAY, FOURWEEKLY_2_HOUR, FOURWEEKLY_2_MINUTE, now)))
+    
+    # Add custom alerts
+    for alert_time, name, message in custom_alerts:
+        next_events.append((f"🔔 {name}", alert_time))
     
     if not next_events:
         await interaction.response.send_message("No events are currently enabled.")
@@ -603,6 +587,7 @@ async def help_scheduler(interaction: discord.Interaction):
 @tree.command(name="add", description="Add a custom one-time alert")
 async def add_custom_alert(
     interaction: discord.Interaction,
+    name: str,
     hour: int,
     minute: int,
     message: str,
@@ -614,6 +599,7 @@ async def add_custom_alert(
     Add a custom one-time alert
     
     Parameters:
+    name: Short name for the alert (e.g., "Boss Spawn", "Guild Meeting")
     hour: Hour in UTC (0-23)
     minute: Minute (0-59)
     message: The message to send
@@ -654,12 +640,17 @@ async def add_custom_alert(
         return
     
     # Add the alert
-    custom_alerts.append((alert_time, message))
+    custom_alerts.append((alert_time, name, message))
     custom_alerts.sort(key=lambda x: x[0])  # Keep sorted by time
     
     embed = discord.Embed(
         title="✅ Custom Alert Added",
         color=discord.Color.green()
+    )
+    embed.add_field(
+        name="Alert Name",
+        value=f"🔔 {name}",
+        inline=False
     )
     embed.add_field(
         name="Scheduled Time",
@@ -695,11 +686,12 @@ async def list_custom_alerts(interaction: discord.Interaction):
         color=discord.Color.blue()
     )
     
-    for i, (alert_time, message) in enumerate(custom_alerts[:10], 1):  # Show max 10
+    for i, (alert_time, name, message) in enumerate(custom_alerts[:10], 1):  # Show max 10
         time_remaining = alert_time - now
+        message_preview = message[:100] + "..." if len(message) > 100 else message
         embed.add_field(
-            name=f"#{i} - <t:{int(alert_time.timestamp())}:R>",
-            value=f"**In:** {format_time_remaining(time_remaining)}\n**Message:** {message[:100]}{'...' if len(message) > 100 else ''}",
+            name=f"#{i} - 🔔 {name}",
+            value=f"**When:** <t:{int(alert_time.timestamp())}:R>\n**In:** {format_time_remaining(time_remaining)}\n**Message:** {message_preview}",
             inline=False
         )
     
