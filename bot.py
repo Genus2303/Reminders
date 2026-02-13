@@ -10,7 +10,7 @@ ENABLE_48H_EVENTS = True
 ENABLE_WEEKLY_EVENTS = False
 ENABLE_BIWEEKLY_EVENTS = True
 ENABLE_4WEEKLY_EVENTS = True
-ENABLE_TEST_ALERT = False  # Set to True to enable test alerts every 5 minutes
+ENABLE_TEST_ALERT = True  # Set to True to enable test alerts every 5 minutes
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -522,4 +522,5 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
