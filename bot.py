@@ -477,6 +477,18 @@ async def next_event(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed)
 
+@tree.command(name="test", description="Send a test notification to verify the bot is working")
+async def test_notification(interaction: discord.Interaction):
+    """Send a test notification"""
+    now = datetime.now(UTC)
+    
+    # Send response to user first
+    await interaction.response.send_message("✅ Sending test notification...", ephemeral=True)
+    
+    # Send test message to the channel
+    await send_message(f"🧪 **TEST NOTIFICATION**\nBot is working correctly!\nCurrent time: {now.strftime('%Y-%m-%d %H:%M:%S UTC')}\nTriggered by: {interaction.user.mention}")
+
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
@@ -492,7 +504,10 @@ async def on_ready():
     print(f"  4-Weekly Events: {'ENABLED' if ENABLE_4WEEKLY_EVENTS else 'DISABLED'}")
     
     await tree.sync()
-    print(f"\nSlash commands synced! Use /events or /next")
+    print(f"\nSlash commands synced! Available commands:")
+    print(f"  /events - Show all upcoming events")
+    print(f"  /next - Show the next event")
+    print(f"  /test - Send a test notification")
     
     scheduler.start()
 
