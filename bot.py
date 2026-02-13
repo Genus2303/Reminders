@@ -14,6 +14,7 @@ ENABLE_TEST_ALERT = False  # Set to True to enable test alerts every 5 minutes
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
+GUILD_ID = os.getenv("GUILD_ID")  # Optional: Set your server ID for instant command sync
 
 intents = discord.Intents.default()
 bot = discord.Client(intents=intents)
@@ -503,8 +504,17 @@ async def on_ready():
     print(f"  Biweekly Events: {'ENABLED' if ENABLE_BIWEEKLY_EVENTS else 'DISABLED'}")
     print(f"  4-Weekly Events: {'ENABLED' if ENABLE_4WEEKLY_EVENTS else 'DISABLED'}")
     
-    await tree.sync()
-    print(f"\nSlash commands synced! Available commands:")
+    # Sync commands - use guild sync if GUILD_ID is set for instant updates
+    if GUILD_ID:
+        guild = discord.Object(id=int(GUILD_ID))
+        tree.copy_global_to(guild=guild)
+        await tree.sync(guild=guild)
+        print(f"\n✅ Slash commands synced to guild {GUILD_ID} (instant)")
+    else:
+        await tree.sync()
+        print(f"\n⏳ Slash commands synced globally (may take up to 1 hour)")
+    
+    print(f"\nAvailable commands:")
     print(f"  /events - Show all upcoming events")
     print(f"  /next - Show the next event")
     print(f"  /test - Send a test notification")
