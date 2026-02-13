@@ -111,6 +111,9 @@ last_run = {
     'test_alert': None
 }
 
+# === CUSTOM ONE-TIME ALERTS ===
+custom_alerts = []  # List of tuples: (datetime, message)
+
 async def send_message(message):
     await bot.wait_until_ready()
     channel = bot.get_channel(CHANNEL_ID)
@@ -271,6 +274,19 @@ def is_time_match(now, target_hour, target_minute):
 @tasks.loop(minutes=1)
 async def scheduler():
     now = datetime.now(UTC)
+    
+    # === CUSTOM ONE-TIME ALERTS ===
+    global custom_alerts
+    triggered_alerts = []
+    for alert_time, message in custom_alerts:
+        # Check if it's time for this alert (with 1-minute window)
+        if is_time_match(now, alert_time.hour, alert_time.minute) and now.date() == alert_time.date():
+            await send_message(message)
+            triggered_alerts.append((alert_time, message))
+    
+    # Remove triggered alerts
+    for alert in triggered_alerts:
+        custom_alerts.remove(alert)
     
     # === TEST ALERT ===
     if ENABLE_TEST_ALERT:
@@ -524,6 +540,8 @@ async def help_scheduler(interaction: discord.Interaction):
             "**`/next`** - Show only the next upcoming event\n"
             "**`/test`** - Send a one-time test notification\n"
             "**`/toggle_test`** - Enable/disable automatic test alerts (every 5 min)\n"
+            "**`/add`** - Add a custom one-time alert\n"
+            "**`/list_custom`** - View all pending custom alerts\n"
             "**`/help_scheduler`** - Show this help menu"
         ),
         inline=False
@@ -536,7 +554,8 @@ async def help_scheduler(interaction: discord.Interaction):
             f"**48-Hour Events:** {len([x for x in [ENABLE_48H_EVENTS] if x])*2} events - Repeats every 2 days\n"
             f"**Weekly Events:** {len([x for x in [ENABLE_WEEKLY_EVENTS] if x])*2} events - Repeats every week\n"
             f"**Biweekly Events:** {len([x for x in [ENABLE_BIWEEKLY_EVENTS] if x])*4} events - Repeats every 2 weeks\n"
-            f"**4-Weekly Events:** {len([x for x in [ENABLE_4WEEKLY_EVENTS] if x])*2} events - Repeats every 4 weeks"
+            f"**4-Weekly Events:** {len([x for x in [ENABLE_4WEEKLY_EVENTS] if x])*2} events - Repeats every 4 weeks\n"
+            f"**Custom Alerts:** {len(custom_alerts)} pending - One-time notifications"
         ),
         inline=False
     )
@@ -570,13 +589,122 @@ async def help_scheduler(interaction: discord.Interaction):
             "• **Automatic Reminders** - Get notified before events start\n"
             "• **Timezone Support** - Times shown in your local timezone\n"
             "• **Countdown Timers** - See exactly when events begin\n"
-            "• **Duplicate Prevention** - Smart cooldowns prevent spam"
+            "• **Duplicate Prevention** - Smart cooldowns prevent spam\n"
+            "• **Custom Alerts** - Add one-time notifications anytime"
         ),
         inline=False
     )
     
     # Footer
     embed.set_footer(text="All event times are in UTC • Bot checks every minute")
+    
+    await interaction.response.send_message(embed=embed)
+
+@tree.command(name="add", description="Add a custom one-time alert")
+async def add_custom_alert(
+    interaction: discord.Interaction,
+    hour: int,
+    minute: int,
+    message: str,
+    day: int = None,
+    month: int = None,
+    year: int = None
+):
+    """
+    Add a custom one-time alert
+    
+    Parameters:
+    hour: Hour in UTC (0-23)
+    minute: Minute (0-59)
+    message: The message to send
+    day: Day of month (defaults to today if not specified)
+    month: Month (defaults to current month if not specified)
+    year: Year (defaults to current year if not specified)
+    """
+    global custom_alerts
+    
+    now = datetime.now(UTC)
+    
+    # Validate hour and minute
+    if not (0 <= hour <= 23):
+        await interaction.response.send_message("❌ Hour must be between 0 and 23", ephemeral=True)
+        return
+    
+    if not (0 <= minute <= 59):
+        await interaction.response.send_message("❌ Minute must be between 0 and 59", ephemeral=True)
+        return
+    
+    # Use current date if not specified
+    target_year = year if year is not None else now.year
+    target_month = month if month is not None else now.month
+    target_day = day if day is not None else now.day
+    
+    try:
+        alert_time = datetime(target_year, target_month, target_day, hour, minute, 0, tzinfo=UTC)
+    except ValueError as e:
+        await interaction.response.send_message(f"❌ Invalid date: {e}", ephemeral=True)
+        return
+    
+    # Check if the time is in the past
+    if alert_time < now:
+        await interaction.response.send_message(
+            f"❌ Cannot set alert in the past!\nSpecified time: {alert_time.strftime('%Y-%m-%d %H:%M UTC')}\nCurrent time: {now.strftime('%Y-%m-%d %H:%M UTC')}",
+            ephemeral=True
+        )
+        return
+    
+    # Add the alert
+    custom_alerts.append((alert_time, message))
+    custom_alerts.sort(key=lambda x: x[0])  # Keep sorted by time
+    
+    embed = discord.Embed(
+        title="✅ Custom Alert Added",
+        color=discord.Color.green()
+    )
+    embed.add_field(
+        name="Scheduled Time",
+        value=f"<t:{int(alert_time.timestamp())}:F>",
+        inline=False
+    )
+    embed.add_field(
+        name="Time Until Alert",
+        value=f"**{format_time_remaining(alert_time - now)}**",
+        inline=False
+    )
+    embed.add_field(
+        name="Message",
+        value=message,
+        inline=False
+    )
+    
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+@tree.command(name="list_custom", description="View all pending custom alerts")
+async def list_custom_alerts(interaction: discord.Interaction):
+    """List all pending custom alerts"""
+    
+    if not custom_alerts:
+        await interaction.response.send_message("📭 No custom alerts scheduled.", ephemeral=True)
+        return
+    
+    now = datetime.now(UTC)
+    
+    embed = discord.Embed(
+        title="📋 Pending Custom Alerts",
+        description=f"{len(custom_alerts)} alert(s) scheduled",
+        color=discord.Color.blue()
+    )
+    
+    for i, (alert_time, message) in enumerate(custom_alerts[:10], 1):  # Show max 10
+        time_remaining = alert_time - now
+        embed.add_field(
+            name=f"#{i} - <t:{int(alert_time.timestamp())}:R>",
+            value=f"**In:** {format_time_remaining(time_remaining)}\n**Message:** {message[:100]}{'...' if len(message) > 100 else ''}",
+            inline=False
+        )
+    
+    if len(custom_alerts) > 10:
+        embed.set_footer(text=f"Showing 10 of {len(custom_alerts)} alerts")
     
     await interaction.response.send_message(embed=embed)
 
@@ -610,6 +738,8 @@ async def on_ready():
     print(f"  /next - Show the next event")
     print(f"  /test - Send a test notification")
     print(f"  /toggle_test - Toggle automatic test alerts on/off")
+    print(f"  /add - Add a custom one-time alert")
+    print(f"  /list_custom - View pending custom alerts")
     print(f"  /help_scheduler - Show help menu with all commands")
     
     scheduler.start()
