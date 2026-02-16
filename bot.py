@@ -11,6 +11,7 @@ ENABLE_WEEKLY_EVENTS = False
 ENABLE_BIWEEKLY_EVENTS = True
 ENABLE_4WEEKLY_EVENTS = True
 ENABLE_TEST_ALERT = False  # Set to True to enable test alerts every 5 minutes
+ENABLE_DAILY_SUMMARY = True  # Set to True to send daily event summary at 00:00 UTC
 
 TOKEN = os.getenv("TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
@@ -108,7 +109,8 @@ last_run = {
     'biweekly_event_4': None,
     '4weekly_event_1': None,
     '4weekly_event_2': None,
-    'test_alert': None
+    'test_alert': None,
+    'daily_summary': None
 }
 
 # === CUSTOM ONE-TIME ALERTS ===
@@ -271,9 +273,127 @@ def is_time_match(now, target_hour, target_minute):
     """Check if current time matches target time (with 1-minute window)"""
     return now.hour == target_hour and abs(now.minute - target_minute) <= 1
 
+def get_todays_events(now):
+    """Get all events scheduled for today with their times and finished status"""
+    today = now.date()
+    today_events = []
+    
+    # Check 48-hour events
+    if ENABLE_48H_EVENTS:
+        next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
+        if next_bear1.date() == today:
+            today_events.append((next_bear1, EVENT_48H_1_NAME, next_bear1 < now))
+        
+        prev_bear1 = next_bear1 - timedelta(hours=48)
+        if prev_bear1.date() == today:
+            today_events.append((prev_bear1, EVENT_48H_1_NAME, prev_bear1 < now))
+        
+        next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
+        if next_bear2.date() == today:
+            today_events.append((next_bear2, EVENT_48H_2_NAME, next_bear2 < now))
+        
+        prev_bear2 = next_bear2 - timedelta(hours=48)
+        if prev_bear2.date() == today:
+            today_events.append((prev_bear2, EVENT_48H_2_NAME, prev_bear2 < now))
+    
+    # Check weekly events
+    if ENABLE_WEEKLY_EVENTS:
+        if now.weekday() == WEEKLY_1_DAY:
+            event_time = datetime.combine(today, datetime.min.time()).replace(
+                hour=WEEKLY_1_HOUR, minute=WEEKLY_1_MINUTE, tzinfo=UTC
+            )
+            today_events.append((event_time, WEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == WEEKLY_2_DAY:
+            event_time = datetime.combine(today, datetime.min.time()).replace(
+                hour=WEEKLY_2_HOUR, minute=WEEKLY_2_MINUTE, tzinfo=UTC
+            )
+            today_events.append((event_time, WEEKLY_2_NAME, event_time < now))
+    
+    # Check biweekly events
+    if ENABLE_BIWEEKLY_EVENTS:
+        if now.weekday() == BIWEEKLY_1_DAY:
+            days_diff = (today - BIWEEKLY_1_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_1_HOUR, minute=BIWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_2_DAY:
+            days_diff = (today - BIWEEKLY_2_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_2_HOUR, minute=BIWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_2_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_3_DAY:
+            days_diff = (today - BIWEEKLY_3_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_3_HOUR, minute=BIWEEKLY_3_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_3_NAME, event_time < now))
+        
+        if now.weekday() == BIWEEKLY_4_DAY:
+            days_diff = (today - BIWEEKLY_4_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=BIWEEKLY_4_HOUR, minute=BIWEEKLY_4_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, BIWEEKLY_4_NAME, event_time < now))
+    
+    # Check 4-weekly events
+    if ENABLE_4WEEKLY_EVENTS:
+        if now.weekday() == FOURWEEKLY_1_DAY:
+            days_diff = (today - FOURWEEKLY_1_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=FOURWEEKLY_1_HOUR, minute=FOURWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, FOURWEEKLY_1_NAME, event_time < now))
+        
+        if now.weekday() == FOURWEEKLY_2_DAY:
+            days_diff = (today - FOURWEEKLY_2_REFERENCE.date()).days
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time = datetime.combine(today, datetime.min.time()).replace(
+                    hour=FOURWEEKLY_2_HOUR, minute=FOURWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                today_events.append((event_time, FOURWEEKLY_2_NAME, event_time < now))
+    
+    # Check custom alerts
+    for alert_time, name, message in custom_alerts:
+        if alert_time.date() == today:
+            today_events.append((alert_time, f"🔔 {name}", alert_time < now))
+    
+    # Sort by time
+    today_events.sort(key=lambda x: x[0])
+    
+    return today_events
+
 @tasks.loop(minutes=1)
 async def scheduler():
     now = datetime.now(UTC)
+    
+    # === DAILY SUMMARY at 00:00 UTC ===
+    if ENABLE_DAILY_SUMMARY:
+        if now.hour == 0 and now.minute == 0 and should_run_event('daily_summary', now, cooldown_minutes=1400):  # ~23 hours
+            today_events = get_todays_events(now)
+            
+            if today_events:
+                message = f"📅 **TODAY'S EVENTS** - {now.strftime('%A, %B %d, %Y')}\n\n"
+                
+                for event_time, event_name, _ in today_events:
+                    time_str = event_time.strftime('%H:%M UTC')
+                    message += f"• **{time_str}** - {event_name}\n"
+                
+                message += f"\n{len(today_events)} event(s) scheduled today! 🎯"
+                await send_message(message)
+            else:
+                await send_message(f"📅 **TODAY'S EVENTS** - {now.strftime('%A, %B %d, %Y')}\n\nNo events scheduled for today. Enjoy your day! ☀️")
+            
+            mark_event_run('daily_summary', now)
     
     # === CUSTOM ONE-TIME ALERTS ===
     global custom_alerts
@@ -707,99 +827,9 @@ async def today_events(interaction: discord.Interaction):
     now = datetime.now(UTC)
     today = now.date()
     
-    today_events = []
+    today_events_list = get_todays_events(now)
     
-    # Check 48-hour events
-    if ENABLE_48H_EVENTS:
-        next_bear1 = get_next_48h_event_time(EVENT_48H_1_START, now)
-        if next_bear1.date() == today:
-            today_events.append((next_bear1, EVENT_48H_1_NAME, next_bear1 < now))
-        
-        # Also check if the previous occurrence was today
-        prev_bear1 = next_bear1 - timedelta(hours=48)
-        if prev_bear1.date() == today:
-            today_events.append((prev_bear1, EVENT_48H_1_NAME, prev_bear1 < now))
-        
-        next_bear2 = get_next_48h_event_time(EVENT_48H_2_START, now)
-        if next_bear2.date() == today:
-            today_events.append((next_bear2, EVENT_48H_2_NAME, next_bear2 < now))
-        
-        prev_bear2 = next_bear2 - timedelta(hours=48)
-        if prev_bear2.date() == today:
-            today_events.append((prev_bear2, EVENT_48H_2_NAME, prev_bear2 < now))
-    
-    # Check weekly events
-    if ENABLE_WEEKLY_EVENTS:
-        if now.weekday() == WEEKLY_1_DAY:
-            event_time = datetime.combine(today, datetime.min.time()).replace(
-                hour=WEEKLY_1_HOUR, minute=WEEKLY_1_MINUTE, tzinfo=UTC
-            )
-            today_events.append((event_time, WEEKLY_1_NAME, event_time < now))
-        
-        if now.weekday() == WEEKLY_2_DAY:
-            event_time = datetime.combine(today, datetime.min.time()).replace(
-                hour=WEEKLY_2_HOUR, minute=WEEKLY_2_MINUTE, tzinfo=UTC
-            )
-            today_events.append((event_time, WEEKLY_2_NAME, event_time < now))
-    
-    # Check biweekly events
-    if ENABLE_BIWEEKLY_EVENTS:
-        if now.weekday() == BIWEEKLY_1_DAY:
-            days_diff = (today - BIWEEKLY_1_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=BIWEEKLY_1_HOUR, minute=BIWEEKLY_1_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, BIWEEKLY_1_NAME, event_time < now))
-        
-        if now.weekday() == BIWEEKLY_2_DAY:
-            days_diff = (today - BIWEEKLY_2_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=BIWEEKLY_2_HOUR, minute=BIWEEKLY_2_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, BIWEEKLY_2_NAME, event_time < now))
-        
-        if now.weekday() == BIWEEKLY_3_DAY:
-            days_diff = (today - BIWEEKLY_3_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=BIWEEKLY_3_HOUR, minute=BIWEEKLY_3_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, BIWEEKLY_3_NAME, event_time < now))
-        
-        if now.weekday() == BIWEEKLY_4_DAY:
-            days_diff = (today - BIWEEKLY_4_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=BIWEEKLY_4_HOUR, minute=BIWEEKLY_4_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, BIWEEKLY_4_NAME, event_time < now))
-    
-    # Check 4-weekly events
-    if ENABLE_4WEEKLY_EVENTS:
-        if now.weekday() == FOURWEEKLY_1_DAY:
-            days_diff = (today - FOURWEEKLY_1_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=FOURWEEKLY_1_HOUR, minute=FOURWEEKLY_1_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, FOURWEEKLY_1_NAME, event_time < now))
-        
-        if now.weekday() == FOURWEEKLY_2_DAY:
-            days_diff = (today - FOURWEEKLY_2_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
-                event_time = datetime.combine(today, datetime.min.time()).replace(
-                    hour=FOURWEEKLY_2_HOUR, minute=FOURWEEKLY_2_MINUTE, tzinfo=UTC
-                )
-                today_events.append((event_time, FOURWEEKLY_2_NAME, event_time < now))
-    
-    # Check custom alerts
-    for alert_time, name, message in custom_alerts:
-        if alert_time.date() == today:
-            today_events.append((alert_time, f"🔔 {name}", alert_time < now))
-    
-    if not today_events:
+    if not today_events_list:
         embed = discord.Embed(
             title="📅 Today's Events",
             description=f"No events scheduled for {today.strftime('%A, %B %d, %Y')}",
@@ -808,16 +838,13 @@ async def today_events(interaction: discord.Interaction):
         await interaction.response.send_message(embed=embed)
         return
     
-    # Sort by time
-    today_events.sort(key=lambda x: x[0])
-    
     embed = discord.Embed(
         title="📅 Today's Events",
-        description=f"{today.strftime('%A, %B %d, %Y')} • {len(today_events)} event(s)",
+        description=f"{today.strftime('%A, %B %d, %Y')} • {len(today_events_list)} event(s)",
         color=discord.Color.blue()
     )
     
-    for event_time, event_name, is_finished in today_events:
+    for event_time, event_name, is_finished in today_events_list:
         status = "✅ Finished" if is_finished else f"⏰ In {format_time_remaining(event_time - now)}"
         time_str = event_time.strftime("%H:%M UTC")
         
@@ -835,6 +862,7 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
     print(f"Bot is monitoring events in channel ID: {CHANNEL_ID}")
     print(f"\nScheduled Events (all times in UTC):")
+    print(f"  Daily Summary: {'ENABLED (00:00 UTC)' if ENABLE_DAILY_SUMMARY else 'DISABLED'}")
     print(f"  Test Alert: {'ENABLED (every 5 minutes)' if ENABLE_TEST_ALERT else 'DISABLED'}")
     print(f"  48h Events: {'ENABLED' if ENABLE_48H_EVENTS else 'DISABLED'}")
     if ENABLE_48H_EVENTS:
@@ -867,3 +895,8 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
+===================================================================
+NOTE: This is the OLD bot. You need to make the changes listed in
+COMPLETE_BOT_README.md to add the alert_before functionality.
+===================================================================
