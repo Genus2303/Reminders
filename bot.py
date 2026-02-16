@@ -896,7 +896,3 @@ async def on_ready():
 
 bot.run(TOKEN)
 
-===================================================================
-NOTE: This is the OLD bot. You need to make the changes listed in
-COMPLETE_BOT_README.md to add the alert_before functionality.
-===================================================================
