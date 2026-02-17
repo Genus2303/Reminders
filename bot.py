@@ -871,6 +871,41 @@ async def list_custom_alerts(interaction: discord.Interaction):
         embed.set_footer(text=f"Showing 10 of {len(custom_alerts)} alerts")
     
     await interaction.response.send_message(embed=embed)
+@tree.command(name="remove", description="Remove a custom alert by its number")
+async def remove_custom_alert(interaction: discord.Interaction, index: int):
+    """
+    Remove a custom alert using its number from /list_custom
+    """
+    global custom_alerts
+
+    if not custom_alerts:
+        await interaction.response.send_message("📭 No custom alerts to remove.", ephemeral=True)
+        return
+
+    if index < 1 or index > len(custom_alerts):
+        await interaction.response.send_message(
+            f"❌ Invalid index. Please choose a number between 1 and {len(custom_alerts)}.",
+            ephemeral=True
+        )
+        return
+
+    # Remove alert (index-1 because list starts at 0)
+    removed_alert = custom_alerts.pop(index - 1)
+
+    alert_time, name, message, alert_before = removed_alert
+
+    embed = discord.Embed(
+        title="🗑️ Custom Alert Removed",
+        color=discord.Color.red()
+    )
+
+    embed.add_field(
+        name="Removed Alert",
+        value=f"🔔 {name}\n<t:{int(alert_time.timestamp())}:F>",
+        inline=False
+    )
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @tree.command(name="today", description="Show all events scheduled for today")
 async def today_events(interaction: discord.Interaction):
@@ -946,3 +981,4 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
