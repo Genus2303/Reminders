@@ -29,69 +29,79 @@ UTC = pytz.UTC
 
 # 48-HOUR EVENTS
 EVENT_48H_1_NAME = "🐻 Bear 1"
-EVENT_48H_1_START = datetime(2026, 2, 13, 11, 20, 0)
-EVENT_48H_1_MESSAGE = "@everyone 🐻 Bear 1 starts in 10 minutes!"
+EVENT_48H_1_START = datetime(2026, 2, 13, 11, 30, 0)
+EVENT_48H_1_ALERT_BEFORE = 10
+EVENT_48H_1_MESSAGE = "@everyone 🐻 Bear 1 starts in {ALERT_MINUTES} minutes!"
 
 EVENT_48H_2_NAME = "🐻 Bear 2"
-EVENT_48H_2_START = datetime(2026, 2, 13, 19, 50, 0)
-EVENT_48H_2_MESSAGE = "@everyone 🐻 Bear 2 starts in 10 minutes!"
+EVENT_48H_2_START = datetime(2026, 2, 13, 20, 0, 0)
+EVENT_48H_2_ALERT_BEFORE = 10
+EVENT_48H_2_MESSAGE = "@everyone 🐻 Bear 2 starts in {ALERT_MINUTES} minutes!"
 
 # WEEKLY EVENTS
 WEEKLY_1_NAME = "⚔️ Weekly Event 1"
 WEEKLY_1_DAY = 6  # 0=Monday, 6=Sunday
 WEEKLY_1_HOUR = 14
 WEEKLY_1_MINUTE = 0
-WEEKLY_1_MESSAGE = "@everyone ⚔️ Weekly Event 1 starts now!"
+WEEKLY_1_ALERT_BEFORE = 10
+WEEKLY_1_MESSAGE = "@everyone ⚔️ Weekly Event 1 starts in {ALERT_MINUTES} minutes!"
 
 WEEKLY_2_NAME = "🎯 Weekly Event 2"
 WEEKLY_2_DAY = 2  # Wednesday
 WEEKLY_2_HOUR = 20
 WEEKLY_2_MINUTE = 0
-WEEKLY_2_MESSAGE = "@everyone 🎯 Weekly Event 2 starts now!"
+WEEKLY_2_ALERT_BEFORE = 10
+WEEKLY_2_MESSAGE = "@everyone 🎯 Weekly Event 2 starts in {ALERT_MINUTES} minutes!"
 
 # BIWEEKLY EVENTS
 BIWEEKLY_1_NAME = "⚔️ Foundry legion 2"
-BIWEEKLY_1_REFERENCE = datetime(2026, 2, 8, 11, 50, 0)
+BIWEEKLY_1_REFERENCE = datetime(2026, 2, 8, 12, 0, 0)
 BIWEEKLY_1_DAY = 6  # Sunday
-BIWEEKLY_1_HOUR = 11
-BIWEEKLY_1_MINUTE = 50
-BIWEEKLY_1_MESSAGE = "@everyone ⚔️ Foundry legion 2 starts in 10 minutes!"
+BIWEEKLY_1_HOUR = 12
+BIWEEKLY_1_MINUTE = 0
+BIWEEKLY_1_ALERT_BEFORE = 10
+BIWEEKLY_1_MESSAGE = "@everyone ⚔️ Foundry legion 2 starts in {ALERT_MINUTES} minutes!"
 
 BIWEEKLY_2_NAME = "⚔️ Foundry legion 1"
-BIWEEKLY_2_REFERENCE = datetime(2026, 2, 8, 19, 50, 0)
+BIWEEKLY_2_REFERENCE = datetime(2026, 2, 8, 20, 0, 0)
 BIWEEKLY_2_DAY = 6  # Sunday
-BIWEEKLY_2_HOUR = 19
-BIWEEKLY_2_MINUTE = 50
-BIWEEKLY_2_MESSAGE = "@everyone ⚔️ Foundry legion 1 starts in 10 minutes!"
+BIWEEKLY_2_HOUR = 20
+BIWEEKLY_2_MINUTE = 0
+BIWEEKLY_2_ALERT_BEFORE = 10
+BIWEEKLY_2_MESSAGE = "@everyone ⚔️ Foundry legion 1 starts in {ALERT_MINUTES} minutes!"
 
 BIWEEKLY_3_NAME = "😈 Crazy Joe (Tuesday)"
-BIWEEKLY_3_REFERENCE = datetime(2026, 1, 27, 11, 50, 0)
+BIWEEKLY_3_REFERENCE = datetime(2026, 1, 27, 12, 0, 0)
 BIWEEKLY_3_DAY = 1  # Tuesday
-BIWEEKLY_3_HOUR = 11
-BIWEEKLY_3_MINUTE = 50
-BIWEEKLY_3_MESSAGE = "@everyone 😈 Crazy Joe starts in 10 minutes!"
+BIWEEKLY_3_HOUR = 12
+BIWEEKLY_3_MINUTE = 0
+BIWEEKLY_3_ALERT_BEFORE = 10
+BIWEEKLY_3_MESSAGE = "@everyone 😈 Crazy Joe starts in {ALERT_MINUTES} minutes!"
 
 BIWEEKLY_4_NAME = "😈 Crazy Joe (Thursday)"
-BIWEEKLY_4_REFERENCE = datetime(2026, 1, 29, 19, 50, 0)
+BIWEEKLY_4_REFERENCE = datetime(2026, 1, 29, 20, 0, 0)
 BIWEEKLY_4_DAY = 3  # Thursday
-BIWEEKLY_4_HOUR = 19
-BIWEEKLY_4_MINUTE = 50
-BIWEEKLY_4_MESSAGE = "@everyone 😈 Crazy Joe starts in 10 minutes!"
+BIWEEKLY_4_HOUR = 20
+BIWEEKLY_4_MINUTE = 0
+BIWEEKLY_4_ALERT_BEFORE = 10
+BIWEEKLY_4_MESSAGE = "@everyone 😈 Crazy Joe starts in {ALERT_MINUTES} minutes!"
 
 # 4-WEEKLY EVENTS
 FOURWEEKLY_1_NAME = "✈️ Canyon legion 1"
-FOURWEEKLY_1_REFERENCE = datetime(2026, 1, 24, 11, 50, 0)
+FOURWEEKLY_1_REFERENCE = datetime(2026, 1, 24, 12, 0, 0)
 FOURWEEKLY_1_DAY = 5  # Saturday
-FOURWEEKLY_1_HOUR = 11
-FOURWEEKLY_1_MINUTE = 50
-FOURWEEKLY_1_MESSAGE = "@everyone ✈️ Canyon legion 1 starts in 10 minutes!"
+FOURWEEKLY_1_HOUR = 12
+FOURWEEKLY_1_MINUTE = 0
+FOURWEEKLY_1_ALERT_BEFORE = 10
+FOURWEEKLY_1_MESSAGE = "@everyone ✈️ Canyon legion 1 starts in {ALERT_MINUTES} minutes!"
 
 FOURWEEKLY_2_NAME = "✈️ Canyon legion 2"
-FOURWEEKLY_2_REFERENCE = datetime(2026, 1, 24, 19, 50, 0)
+FOURWEEKLY_2_REFERENCE = datetime(2026, 1, 24, 20, 0, 0)
 FOURWEEKLY_2_DAY = 5  # Saturday
-FOURWEEKLY_2_HOUR = 19
-FOURWEEKLY_2_MINUTE = 50
-FOURWEEKLY_2_MESSAGE = "@everyone ✈️ Canyon legion 2 starts in 10 minutes!"
+FOURWEEKLY_2_HOUR = 20
+FOURWEEKLY_2_MINUTE = 0
+FOURWEEKLY_2_ALERT_BEFORE = 10
+FOURWEEKLY_2_MESSAGE = "@everyone ✈️ Canyon legion 2 starts in {ALERT_MINUTES} minutes!"
 
 # ====================================================================
 # === END OF EVENT CONFIGURATION ===
@@ -114,7 +124,7 @@ last_run = {
 }
 
 # === CUSTOM ONE-TIME ALERTS ===
-custom_alerts = []  # List of tuples: (datetime, name, message)
+custom_alerts = []  # List of tuples: (datetime, name, message, alert_before_minutes)
 
 async def send_message(message):
     await bot.wait_until_ready()
@@ -246,29 +256,6 @@ def get_next_4weekly_event_time(reference_date, target_weekday, target_hour, tar
     
     return candidate_time
 
-def should_trigger_48h_event(start_date, now):
-    """Check if a 48-hour interval event should trigger (with 2-minute window)"""
-    if start_date.tzinfo is None:
-        start_date = UTC.localize(start_date)
-    
-    time_diff = now - start_date
-    
-    if time_diff.total_seconds() < 0:
-        return False
-    
-    hours_since_start = time_diff.total_seconds() / 3600
-    intervals_passed = hours_since_start / 48
-    
-    interval_number = round(intervals_passed)
-    expected_time = start_date + timedelta(hours=interval_number * 48)
-    
-    # Allow 2-minute window (1 minute before and 1 minute after)
-    if now.hour == expected_time.hour and abs(now.minute - expected_time.minute) <= 1:
-        if abs(intervals_passed - interval_number) < (2/60):  # Within 2 minutes
-            return True
-    
-    return False
-
 def is_time_match(now, target_hour, target_minute):
     """Check if current time matches target time (with 1-minute window)"""
     return now.hour == target_hour and abs(now.minute - target_minute) <= 1
@@ -363,7 +350,7 @@ def get_todays_events(now):
                 today_events.append((event_time, FOURWEEKLY_2_NAME, event_time < now))
     
     # Check custom alerts
-    for alert_time, name, message in custom_alerts:
+    for alert_time, name, message, alert_before in custom_alerts:
         if alert_time.date() == today:
             today_events.append((alert_time, f"🔔 {name}", alert_time < now))
     
@@ -398,11 +385,12 @@ async def scheduler():
     # === CUSTOM ONE-TIME ALERTS ===
     global custom_alerts
     triggered_alerts = []
-    for alert_time, name, message in custom_alerts:
-        # Check if it's time for this alert (with 1-minute window)
-        if is_time_match(now, alert_time.hour, alert_time.minute) and now.date() == alert_time.date():
-            await send_message(message)
-            triggered_alerts.append((alert_time, name, message))
+    for alert_time, name, message, alert_before in custom_alerts:
+        alert_send_time = alert_time - timedelta(minutes=alert_before)
+        if is_time_match(now, alert_send_time.hour, alert_send_time.minute) and now.date() == alert_send_time.date():
+            final_message = message.replace("{ALERT_MINUTES}", str(alert_before))
+            await send_message(final_message)
+            triggered_alerts.append((alert_time, name, message, alert_before))
     
     # Remove triggered alerts
     for alert in triggered_alerts:
@@ -416,63 +404,111 @@ async def scheduler():
     
     # === 48-HOUR INTERVAL EVENTS ===
     if ENABLE_48H_EVENTS:
-        if should_trigger_48h_event(EVENT_48H_1_START, now) and should_run_event('48h_event_1', now, cooldown_minutes=2880):
-            await send_message(EVENT_48H_1_MESSAGE)
+        next_48h_1 = get_next_48h_event_time(EVENT_48H_1_START, now)
+        alert_time_48h_1 = next_48h_1 - timedelta(minutes=EVENT_48H_1_ALERT_BEFORE)
+        if is_time_match(now, alert_time_48h_1.hour, alert_time_48h_1.minute) and now.date() == alert_time_48h_1.date() and should_run_event('48h_event_1', now, cooldown_minutes=2880):
+            message = EVENT_48H_1_MESSAGE.replace("{ALERT_MINUTES}", str(EVENT_48H_1_ALERT_BEFORE))
+            await send_message(message)
             mark_event_run('48h_event_1', now)
         
-        if should_trigger_48h_event(EVENT_48H_2_START, now) and should_run_event('48h_event_2', now, cooldown_minutes=2880):
-            await send_message(EVENT_48H_2_MESSAGE)
+        next_48h_2 = get_next_48h_event_time(EVENT_48H_2_START, now)
+        alert_time_48h_2 = next_48h_2 - timedelta(minutes=EVENT_48H_2_ALERT_BEFORE)
+        if is_time_match(now, alert_time_48h_2.hour, alert_time_48h_2.minute) and now.date() == alert_time_48h_2.date() and should_run_event('48h_event_2', now, cooldown_minutes=2880):
+            message = EVENT_48H_2_MESSAGE.replace("{ALERT_MINUTES}", str(EVENT_48H_2_ALERT_BEFORE))
+            await send_message(message)
             mark_event_run('48h_event_2', now)
     
     # === WEEKLY EVENTS ===
     if ENABLE_WEEKLY_EVENTS:
-        if now.weekday() == WEEKLY_1_DAY and is_time_match(now, WEEKLY_1_HOUR, WEEKLY_1_MINUTE) and should_run_event('weekly_event_1', now, cooldown_minutes=10000):
-            await send_message(WEEKLY_1_MESSAGE)
+        next_weekly1 = get_next_weekly_event_time(WEEKLY_1_DAY, WEEKLY_1_HOUR, WEEKLY_1_MINUTE, now)
+        alert_time_weekly1 = next_weekly1 - timedelta(minutes=WEEKLY_1_ALERT_BEFORE)
+        if is_time_match(now, alert_time_weekly1.hour, alert_time_weekly1.minute) and now.date() == alert_time_weekly1.date() and should_run_event('weekly_event_1', now, cooldown_minutes=10000):
+            message = WEEKLY_1_MESSAGE.replace("{ALERT_MINUTES}", str(WEEKLY_1_ALERT_BEFORE))
+            await send_message(message)
             mark_event_run('weekly_event_1', now)
         
-        if now.weekday() == WEEKLY_2_DAY and is_time_match(now, WEEKLY_2_HOUR, WEEKLY_2_MINUTE) and should_run_event('weekly_event_2', now, cooldown_minutes=10000):
-            await send_message(WEEKLY_2_MESSAGE)
+        next_weekly2 = get_next_weekly_event_time(WEEKLY_2_DAY, WEEKLY_2_HOUR, WEEKLY_2_MINUTE, now)
+        alert_time_weekly2 = next_weekly2 - timedelta(minutes=WEEKLY_2_ALERT_BEFORE)
+        if is_time_match(now, alert_time_weekly2.hour, alert_time_weekly2.minute) and now.date() == alert_time_weekly2.date() and should_run_event('weekly_event_2', now, cooldown_minutes=10000):
+            message = WEEKLY_2_MESSAGE.replace("{ALERT_MINUTES}", str(WEEKLY_2_ALERT_BEFORE))
+            await send_message(message)
             mark_event_run('weekly_event_2', now)
     
     # === BIWEEKLY EVENTS ===
     if ENABLE_BIWEEKLY_EVENTS:
-        if now.weekday() == BIWEEKLY_1_DAY and is_time_match(now, BIWEEKLY_1_HOUR, BIWEEKLY_1_MINUTE):
+        if now.weekday() == BIWEEKLY_1_DAY:
             days_diff = (now.date() - BIWEEKLY_1_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_1', now, cooldown_minutes=20000):
-                await send_message(BIWEEKLY_1_MESSAGE)
-                mark_event_run('biweekly_event_1', now)
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time_bw1 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=BIWEEKLY_1_HOUR, minute=BIWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                alert_time_bw1 = event_time_bw1 - timedelta(minutes=BIWEEKLY_1_ALERT_BEFORE)
+                if is_time_match(now, alert_time_bw1.hour, alert_time_bw1.minute) and should_run_event('biweekly_event_1', now, cooldown_minutes=20000):
+                    message = BIWEEKLY_1_MESSAGE.replace("{ALERT_MINUTES}", str(BIWEEKLY_1_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('biweekly_event_1', now)
         
-        if now.weekday() == BIWEEKLY_2_DAY and is_time_match(now, BIWEEKLY_2_HOUR, BIWEEKLY_2_MINUTE):
+        if now.weekday() == BIWEEKLY_2_DAY:
             days_diff = (now.date() - BIWEEKLY_2_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_2', now, cooldown_minutes=20000):
-                await send_message(BIWEEKLY_2_MESSAGE)
-                mark_event_run('biweekly_event_2', now)
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time_bw2 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=BIWEEKLY_2_HOUR, minute=BIWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                alert_time_bw2 = event_time_bw2 - timedelta(minutes=BIWEEKLY_2_ALERT_BEFORE)
+                if is_time_match(now, alert_time_bw2.hour, alert_time_bw2.minute) and should_run_event('biweekly_event_2', now, cooldown_minutes=20000):
+                    message = BIWEEKLY_2_MESSAGE.replace("{ALERT_MINUTES}", str(BIWEEKLY_2_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('biweekly_event_2', now)
         
-        if now.weekday() == BIWEEKLY_3_DAY and is_time_match(now, BIWEEKLY_3_HOUR, BIWEEKLY_3_MINUTE):
+        if now.weekday() == BIWEEKLY_3_DAY:
             days_diff = (now.date() - BIWEEKLY_3_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_3', now, cooldown_minutes=20000):
-                await send_message(BIWEEKLY_3_MESSAGE)
-                mark_event_run('biweekly_event_3', now)
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time_bw3 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=BIWEEKLY_3_HOUR, minute=BIWEEKLY_3_MINUTE, tzinfo=UTC
+                )
+                alert_time_bw3 = event_time_bw3 - timedelta(minutes=BIWEEKLY_3_ALERT_BEFORE)
+                if is_time_match(now, alert_time_bw3.hour, alert_time_bw3.minute) and should_run_event('biweekly_event_3', now, cooldown_minutes=20000):
+                    message = BIWEEKLY_3_MESSAGE.replace("{ALERT_MINUTES}", str(BIWEEKLY_3_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('biweekly_event_3', now)
         
-        if now.weekday() == BIWEEKLY_4_DAY and is_time_match(now, BIWEEKLY_4_HOUR, BIWEEKLY_4_MINUTE):
+        if now.weekday() == BIWEEKLY_4_DAY:
             days_diff = (now.date() - BIWEEKLY_4_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 2 == 0 and should_run_event('biweekly_event_4', now, cooldown_minutes=20000):
-                await send_message(BIWEEKLY_4_MESSAGE)
-                mark_event_run('biweekly_event_4', now)
+            if days_diff >= 0 and (days_diff // 7) % 2 == 0:
+                event_time_bw4 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=BIWEEKLY_4_HOUR, minute=BIWEEKLY_4_MINUTE, tzinfo=UTC
+                )
+                alert_time_bw4 = event_time_bw4 - timedelta(minutes=BIWEEKLY_4_ALERT_BEFORE)
+                if is_time_match(now, alert_time_bw4.hour, alert_time_bw4.minute) and should_run_event('biweekly_event_4', now, cooldown_minutes=20000):
+                    message = BIWEEKLY_4_MESSAGE.replace("{ALERT_MINUTES}", str(BIWEEKLY_4_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('biweekly_event_4', now)
     
     # === 4-WEEKLY EVENTS ===
     if ENABLE_4WEEKLY_EVENTS:
-        if now.weekday() == FOURWEEKLY_1_DAY and is_time_match(now, FOURWEEKLY_1_HOUR, FOURWEEKLY_1_MINUTE):
+        if now.weekday() == FOURWEEKLY_1_DAY:
             days_diff = (now.date() - FOURWEEKLY_1_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 4 == 0 and should_run_event('4weekly_event_1', now, cooldown_minutes=40000):
-                await send_message(FOURWEEKLY_1_MESSAGE)
-                mark_event_run('4weekly_event_1', now)
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time_4w1 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=FOURWEEKLY_1_HOUR, minute=FOURWEEKLY_1_MINUTE, tzinfo=UTC
+                )
+                alert_time_4w1 = event_time_4w1 - timedelta(minutes=FOURWEEKLY_1_ALERT_BEFORE)
+                if is_time_match(now, alert_time_4w1.hour, alert_time_4w1.minute) and should_run_event('4weekly_event_1', now, cooldown_minutes=40000):
+                    message = FOURWEEKLY_1_MESSAGE.replace("{ALERT_MINUTES}", str(FOURWEEKLY_1_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('4weekly_event_1', now)
         
-        if now.weekday() == FOURWEEKLY_2_DAY and is_time_match(now, FOURWEEKLY_2_HOUR, FOURWEEKLY_2_MINUTE):
+        if now.weekday() == FOURWEEKLY_2_DAY:
             days_diff = (now.date() - FOURWEEKLY_2_REFERENCE.date()).days
-            if days_diff >= 0 and (days_diff // 7) % 4 == 0 and should_run_event('4weekly_event_2', now, cooldown_minutes=40000):
-                await send_message(FOURWEEKLY_2_MESSAGE)
-                mark_event_run('4weekly_event_2', now)
+            if days_diff >= 0 and (days_diff // 7) % 4 == 0:
+                event_time_4w2 = datetime.combine(now.date(), datetime.min.time()).replace(
+                    hour=FOURWEEKLY_2_HOUR, minute=FOURWEEKLY_2_MINUTE, tzinfo=UTC
+                )
+                alert_time_4w2 = event_time_4w2 - timedelta(minutes=FOURWEEKLY_2_ALERT_BEFORE)
+                if is_time_match(now, alert_time_4w2.hour, alert_time_4w2.minute) and should_run_event('4weekly_event_2', now, cooldown_minutes=40000):
+                    message = FOURWEEKLY_2_MESSAGE.replace("{ALERT_MINUTES}", str(FOURWEEKLY_2_ALERT_BEFORE))
+                    await send_message(message)
+                    mark_event_run('4weekly_event_2', now)
 
 @tree.command(name="events", description="Show when all events are scheduled")
 async def show_events(interaction: discord.Interaction):
@@ -511,7 +547,7 @@ async def show_events(interaction: discord.Interaction):
         all_events.append((next_4weekly2, FOURWEEKLY_2_NAME, next_4weekly2))
     
     # Add custom alerts
-    for alert_time, name, message in custom_alerts:
+    for alert_time, name, message, alert_before in custom_alerts:
         all_events.append((alert_time, f"🔔 {name}", alert_time))
     
     if not all_events:
@@ -568,7 +604,7 @@ async def next_event(interaction: discord.Interaction):
         next_events.append((FOURWEEKLY_2_NAME, get_next_4weekly_event_time(FOURWEEKLY_2_REFERENCE, FOURWEEKLY_2_DAY, FOURWEEKLY_2_HOUR, FOURWEEKLY_2_MINUTE, now)))
     
     # Add custom alerts
-    for alert_time, name, message in custom_alerts:
+    for alert_time, name, message, alert_before in custom_alerts:
         next_events.append((f"🔔 {name}", alert_time))
     
     if not next_events:
@@ -712,6 +748,7 @@ async def add_custom_alert(
     hour: int,
     minute: int,
     message: str,
+    alert_before: int = 10,
     day: int = None,
     month: int = None,
     year: int = None
@@ -723,7 +760,8 @@ async def add_custom_alert(
     name: Short name for the alert (e.g., "Boss Spawn", "Guild Meeting")
     hour: Hour in UTC (0-23)
     minute: Minute (0-59)
-    message: The message to send
+    message: The message to send (use {ALERT_MINUTES} as placeholder for the alert time)
+    alert_before: Minutes before the event to send the alert (default: 10)
     day: Day of month (defaults to today if not specified)
     month: Month (defaults to current month if not specified)
     year: Year (defaults to current year if not specified)
@@ -741,6 +779,10 @@ async def add_custom_alert(
         await interaction.response.send_message("❌ Minute must be between 0 and 59", ephemeral=True)
         return
     
+    if not (0 <= alert_before <= 1440):
+        await interaction.response.send_message("❌ Alert before must be between 0 and 1440 minutes", ephemeral=True)
+        return
+    
     # Use current date if not specified
     target_year = year if year is not None else now.year
     target_month = month if month is not None else now.month
@@ -752,16 +794,19 @@ async def add_custom_alert(
         await interaction.response.send_message(f"❌ Invalid date: {e}", ephemeral=True)
         return
     
-    # Check if the time is in the past
-    if alert_time < now:
+    # The alert will fire alert_before minutes BEFORE the event time
+    alert_send_time = alert_time - timedelta(minutes=alert_before)
+    
+    # Check if the send time is in the past
+    if alert_send_time < now:
         await interaction.response.send_message(
-            f"❌ Cannot set alert in the past!\nSpecified time: {alert_time.strftime('%Y-%m-%d %H:%M UTC')}\nCurrent time: {now.strftime('%Y-%m-%d %H:%M UTC')}",
+            f"❌ Alert would fire in the past!\nEvent time: {alert_time.strftime('%Y-%m-%d %H:%M UTC')}\nAlert send time: {alert_send_time.strftime('%Y-%m-%d %H:%M UTC')}\nCurrent time: {now.strftime('%Y-%m-%d %H:%M UTC')}",
             ephemeral=True
         )
         return
     
     # Add the alert
-    custom_alerts.append((alert_time, name, message))
+    custom_alerts.append((alert_time, name, message, alert_before))
     custom_alerts.sort(key=lambda x: x[0])  # Keep sorted by time
     
     embed = discord.Embed(
@@ -774,18 +819,23 @@ async def add_custom_alert(
         inline=False
     )
     embed.add_field(
-        name="Scheduled Time",
+        name="Event Time",
         value=f"<t:{int(alert_time.timestamp())}:F>",
         inline=False
     )
     embed.add_field(
+        name="Alert Fires",
+        value=f"<t:{int(alert_send_time.timestamp())}:F> ({alert_before} min before)",
+        inline=False
+    )
+    embed.add_field(
         name="Time Until Alert",
-        value=f"**{format_time_remaining(alert_time - now)}**",
+        value=f"**{format_time_remaining(alert_send_time - now)}**",
         inline=False
     )
     embed.add_field(
         name="Message",
-        value=message,
+        value=message.replace("{ALERT_MINUTES}", str(alert_before)),
         inline=False
     )
     
@@ -807,12 +857,13 @@ async def list_custom_alerts(interaction: discord.Interaction):
         color=discord.Color.blue()
     )
     
-    for i, (alert_time, name, message) in enumerate(custom_alerts[:10], 1):  # Show max 10
-        time_remaining = alert_time - now
+    for i, (alert_time, name, message, alert_before) in enumerate(custom_alerts[:10], 1):  # Show max 10
+        alert_send_time = alert_time - timedelta(minutes=alert_before)
+        time_remaining = alert_send_time - now
         message_preview = message[:100] + "..." if len(message) > 100 else message
         embed.add_field(
             name=f"#{i} - 🔔 {name}",
-            value=f"**When:** <t:{int(alert_time.timestamp())}:R>\n**In:** {format_time_remaining(time_remaining)}\n**Message:** {message_preview}",
+            value=f"**Event:** <t:{int(alert_time.timestamp())}:F>\n**Alert fires:** <t:{int(alert_send_time.timestamp())}:R> ({alert_before} min before)\n**In:** {format_time_remaining(time_remaining)}\n**Message:** {message_preview}",
             inline=False
         )
     
@@ -866,8 +917,8 @@ async def on_ready():
     print(f"  Test Alert: {'ENABLED (every 5 minutes)' if ENABLE_TEST_ALERT else 'DISABLED'}")
     print(f"  48h Events: {'ENABLED' if ENABLE_48H_EVENTS else 'DISABLED'}")
     if ENABLE_48H_EVENTS:
-        print(f"    - {EVENT_48H_1_NAME}: Every 48 hours starting {EVENT_48H_1_START}")
-        print(f"    - {EVENT_48H_2_NAME}: Every 48 hours starting {EVENT_48H_2_START}")
+        print(f"    - {EVENT_48H_1_NAME}: Every 48 hours starting {EVENT_48H_1_START} (alert {EVENT_48H_1_ALERT_BEFORE} min before)")
+        print(f"    - {EVENT_48H_2_NAME}: Every 48 hours starting {EVENT_48H_2_START} (alert {EVENT_48H_2_ALERT_BEFORE} min before)")
     print(f"  Weekly Events: {'ENABLED' if ENABLE_WEEKLY_EVENTS else 'DISABLED'}")
     print(f"  Biweekly Events: {'ENABLED' if ENABLE_BIWEEKLY_EVENTS else 'DISABLED'}")
     print(f"  4-Weekly Events: {'ENABLED' if ENABLE_4WEEKLY_EVENTS else 'DISABLED'}")
@@ -895,4 +946,3 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
-
