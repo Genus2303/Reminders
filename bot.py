@@ -87,21 +87,21 @@ BIWEEKLY_4_ALERT_BEFORE = 10
 BIWEEKLY_4_MESSAGE = "@everyone 😈 Crazy Joe starts in {ALERT_MINUTES} minutes!"
 
 # 4-WEEKLY EVENTS
-FOURWEEKLY_1_NAME = "✈️ Canyon legion 1"
+FOURWEEKLY_1_NAME = "✈️ Canyon legion 2"
 FOURWEEKLY_1_REFERENCE = datetime(2026, 1, 24, 12, 0, 0)
 FOURWEEKLY_1_DAY = 5  # Saturday
 FOURWEEKLY_1_HOUR = 12
 FOURWEEKLY_1_MINUTE = 0
 FOURWEEKLY_1_ALERT_BEFORE = 10
-FOURWEEKLY_1_MESSAGE = "@everyone ✈️ Canyon legion 1 starts in {ALERT_MINUTES} minutes!"
+FOURWEEKLY_1_MESSAGE = "@everyone ✈️ Canyon legion 2 starts in {ALERT_MINUTES} minutes!"
 
-FOURWEEKLY_2_NAME = "✈️ Canyon legion 2"
+FOURWEEKLY_2_NAME = "✈️ Canyon legion 1"
 FOURWEEKLY_2_REFERENCE = datetime(2026, 1, 24, 20, 0, 0)
 FOURWEEKLY_2_DAY = 5  # Saturday
 FOURWEEKLY_2_HOUR = 20
 FOURWEEKLY_2_MINUTE = 0
 FOURWEEKLY_2_ALERT_BEFORE = 10
-FOURWEEKLY_2_MESSAGE = "@everyone ✈️ Canyon legion 2 starts in {ALERT_MINUTES} minutes!"
+FOURWEEKLY_2_MESSAGE = "@everyone ✈️ Canyon legion 1 starts in {ALERT_MINUTES} minutes!"
 
 # ====================================================================
 # === END OF EVENT CONFIGURATION ===
@@ -981,4 +981,5 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
