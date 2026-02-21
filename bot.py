@@ -98,7 +98,7 @@ FOURWEEKLY_1_MESSAGE = "@everyone ✈️ Canyon legion 1 starts in {ALERT_MINUTE
 FOURWEEKLY_2_NAME = "✈️ Canyon legion 2"
 FOURWEEKLY_2_REFERENCE = datetime(2026, 1, 24, 20, 0, 0)
 FOURWEEKLY_2_DAY = 5  # Saturday
-FOURWEEKLY_2_HOUR = 20
+FOURWEEKLY_2_HOUR = 19
 FOURWEEKLY_2_MINUTE = 0
 FOURWEEKLY_2_ALERT_BEFORE = 10
 FOURWEEKLY_2_MESSAGE = "@everyone ✈️ Canyon legion 2 starts in {ALERT_MINUTES} minutes!"
@@ -981,6 +981,7 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
 
