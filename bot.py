@@ -65,7 +65,7 @@ BIWEEKLY_1_MESSAGE = "@everyone ⚔️ Foundry legion 2 starts in {ALERT_MINUTES
 BIWEEKLY_2_NAME = "⚔️ Foundry legion 1"
 BIWEEKLY_2_REFERENCE = datetime(2026, 2, 8, 20, 0, 0)
 BIWEEKLY_2_DAY = 6  # Sunday
-BIWEEKLY_2_HOUR = 20
+BIWEEKLY_2_HOUR = 19
 BIWEEKLY_2_MINUTE = 0
 BIWEEKLY_2_ALERT_BEFORE = 10
 BIWEEKLY_2_MESSAGE = "@everyone ⚔️ Foundry legion 1 starts in {ALERT_MINUTES} minutes!"
@@ -981,6 +981,7 @@ async def on_ready():
     scheduler.start()
 
 bot.run(TOKEN)
+
 
 
 
